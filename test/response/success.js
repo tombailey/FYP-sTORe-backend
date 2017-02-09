@@ -31,6 +31,32 @@ describe("tests", () => {
   });
 
   describe("success", () => {
+    describe("#created", () => {
+      it("should produce correct json", () => {
+        //arrange
+        var expectedData = null;
+        var mockResponse = {
+          "json": (actualData) => {
+            expect(actualData).to.deep.equal({
+              "data": expectedData
+            });
+          },
+          "status": (code) => {
+            return mockResponse;
+          }
+        };
+
+        //act
+        success.created(mockResponse, expectedData);
+
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("success", () => {
     describe("#ok", () => {
       it("should produce 200 status code", () => {
         //arrange
@@ -48,6 +74,32 @@ describe("tests", () => {
 
         //act
         success.ok(mockResponse, data);
+
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("success", () => {
+    describe("#ok", () => {
+      it("should produce correct json", () => {
+        //arrange
+        var expectedData = null;
+        var mockResponse = {
+          "json": (actualData) => {
+            expect(actualData).to.deep.equal({
+              "data": expectedData
+            });
+          },
+          "status": (code) => {
+            return mockResponse;
+          }
+        };
+
+        //act
+        success.ok(mockResponse, expectedData);
 
 
         //assert
