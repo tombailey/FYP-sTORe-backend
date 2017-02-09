@@ -5,7 +5,11 @@ const CONFIG = require("./config/" + LIFECYCLE);
 
 console.log("Lifecycle is " + LIFECYCLE);
 
-const database = setupMongoose().then(setupExpress);
+setupMongoose()
+	.then(setupExpress)
+	.catch((error) => {
+		console.error("setup failed", error);
+	});
 
 function setupMongoose() {
   return new Promise((resolve, reject) => {
