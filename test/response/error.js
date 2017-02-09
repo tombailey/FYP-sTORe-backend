@@ -38,7 +38,7 @@ describe("tests", () => {
 
         var mockResponse = {
           "json": (data) => {
-            expect(data).to.equal({
+            expect(data).to.deep.equal({
               "errors": [{
                 "code": 400,
                 "message": message
@@ -94,7 +94,7 @@ describe("tests", () => {
 
         var mockResponse = {
           "json": (data) => {
-            expect(data).to.equal({
+            expect(data).to.deep.equal({
               "errors": [{
                 "code": 404,
                 "message": message
@@ -150,7 +150,7 @@ describe("tests", () => {
 
         var mockResponse = {
           "json": (data) => {
-            expect(data).to.equal({
+            expect(data).to.deep.equal({
               "errors": [{
                 "code": 500,
                 "message": message
