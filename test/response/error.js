@@ -31,6 +31,36 @@ describe("tests", () => {
   });
 
   describe("error", () => {
+    describe("#badRequest", () => {
+      it("should produce correct error json", () => {
+        //arrange
+        var message = "bad request";
+
+        var mockResponse = {
+          "json": (data) => {
+            expect(data).to.equal({
+              "errors": [{
+                "code": 400,
+                "message": message
+              }]
+            });
+          },
+          "status": (code) => {
+            return mockResponse;
+          }
+        };
+
+        //act
+        error.badRequest(mockResponse, message);
+
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("error", () => {
     describe("#notFound", () => {
       it("should produce 404 error code", () => {
         //arrange
@@ -57,6 +87,36 @@ describe("tests", () => {
   });
 
   describe("error", () => {
+    describe("#notFound", () => {
+      it("should produce correct error json", () => {
+        //arrange
+        var message = "not found";
+
+        var mockResponse = {
+          "json": (data) => {
+            expect(data).to.equal({
+              "errors": [{
+                "code": 404,
+                "message": message
+              }]
+            });
+          },
+          "status": (code) => {
+            return mockResponse;
+          }
+        };
+
+        //act
+        error.notFound(mockResponse, message);
+
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("error", () => {
     describe("#internalServerError", () => {
       it("should produce 500 error code", () => {
         //arrange
@@ -71,6 +131,36 @@ describe("tests", () => {
         };
         var message = "internal server error";
 
+
+        //act
+        error.internalServerError(mockResponse, message);
+
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("error", () => {
+    describe("#internalServerError", () => {
+      it("should produce correct error json", () => {
+        //arrange
+        var message = "internal server error";
+
+        var mockResponse = {
+          "json": (data) => {
+            expect(data).to.equal({
+              "errors": [{
+                "code": 500,
+                "message": message
+              }]
+            });
+          },
+          "status": (code) => {
+            return mockResponse;
+          }
+        };
 
         //act
         error.internalServerError(mockResponse, message);
