@@ -49,15 +49,17 @@ module.exports = (mongoose) => {
       "type": Number,
       "required": true,
       "default": 0,
-    }, "currentVersionNumber": {
-      "type": Number,
-      "required": true,
-      "default": null,
-    }, "currentVersionDate": {
-      "type": Date,
-      "required": true,
-      "default": null,
-    },"screenshots": {
+    }, "currentVersion": {
+      "number": {
+        "type": Number,
+        "required": true,
+        "default": null,
+      }, "date": {
+        "type": Date,
+        "required": true,
+        "default": null,
+      }
+    }, "screenshots": {
       "type": [String],
       "required": true,
       "validate": {
@@ -125,25 +127,31 @@ module.exports = (mongoose) => {
           return VALID_CATEGORIES.indexOf(value) !== -1;
         }
       }
-    },
+    }, "developer": {
+      "id": {
+        "type": mongoose.Schema.Types.ObjectId,
+        "required": true
+      }
+    }
   });
+
 
   applicationSchema.index({
     "id": 1,
-    "reviewStatus": 1
+    "versions.reviewStatus": 1
   });
   applicationSchema.index({
     "categories": 1,
-    "reviewStatus": 1
+    "versions.reviewStatus": 1
   });
   applicationSchema.index({
     "name": "text",
-    "reviewStatus": 1
+    "versions.reviewStatus": 1
   });
   applicationSchema.index({
     "description": "text",
     "name": "text",
-    "reviewStatus": 1
+    "versions.reviewStatus": 1
   }, {
     "weights": {
       "description": 1,
@@ -153,19 +161,24 @@ module.exports = (mongoose) => {
   applicationSchema.index({
     "categories": 1,
     "name": "text",
-    "reviewStatus": 1
+    "versions.reviewStatus": 1
   });
   applicationSchema.index({
     "categories": 1,
     "description": "text",
     "name": "text",
-    "reviewStatus": 1
+    "versions.reviewStatus": 1
   });
   applicationSchema.index({
     "categories": 1,
     "downloadCount": 1,
-    "reviewStatus": 1
+    "versions.reviewStatus": 1
   });
+  applicationSchema.index({
+    "developer.id": 1,
+    "versions.reviewStatus": 1
+  });
+  
 
   return mongoose.model("Application", applicationSchema);
 };
