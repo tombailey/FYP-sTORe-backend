@@ -73,7 +73,9 @@ const createReview = (mongoose, Application) => {
 
 const getApplication = (mongoose, Application) => {
   return (applicationId, attrs) => {
-    findOne(mongoose, Application)(applicationId, attrs);
+    findOne(mongoose, Application)({
+      "id": applicationId,
+    }, attrs);
   };
 };
 
@@ -85,7 +87,7 @@ const searchByCategory = (mongoose, Application) => {
     return findMany(mongoose, Application)({
       "categories": category,
       "reviewStatus": "accepted"
-    }, "id name description featureGraphic iconLink downloadCount currentVersionNumber currentVersionDate screenshots categories", sort);
+    }, "id name description featureGraphic iconLink downloadCount currentVersion screenshots categories", sort);
   };
 };
 
@@ -97,7 +99,7 @@ const searchByKeywords = (mongoose, Application) => {
         "$text": {
           "$search": keywords
         }
-      }, "id name description featureGraphic iconLink downloadCount currentVersionNumber currentVersionDate screenshots categories", {
+      }, "id name description featureGraphic iconLink downloadCount currentVersion screenshots categories", {
         "score": {
           "$meta": "textScore"
         }
@@ -145,6 +147,7 @@ const findMany = (mongoose, Application) => {
 module.exports = (mongoose, Application) => {
   return {
     "create": create(mongoose, Application),
+    "getApplication": getApplication(mongoose, Application),
     "searchByCategory": searchByCategory(mongoose, Application),
     "searchByKeywords": searchByKeywords(mongoose, Application)
   };
