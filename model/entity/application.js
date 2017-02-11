@@ -71,6 +71,11 @@ module.exports = (mongoose) => {
         "number": {
           "type": Number,
           "required": true,
+          "validate": {
+            "validator": (value) => {
+              return value === null || value >= 0;
+            }
+          }
         }, "binaryLink": {
           "type": String,
           "required": true,
@@ -138,20 +143,20 @@ module.exports = (mongoose) => {
 
   applicationSchema.index({
     "id": 1,
-    "versions.reviewStatus": 1
+    "currentVersion.number": 1
   });
   applicationSchema.index({
     "categories": 1,
-    "versions.reviewStatus": 1
+    "currentVersion.number": 1
   });
   applicationSchema.index({
     "name": "text",
-    "versions.reviewStatus": 1
+    "currentVersion.number": 1
   });
   applicationSchema.index({
     "description": "text",
     "name": "text",
-    "versions.reviewStatus": 1
+    "currentVersion.number": 1
   }, {
     "weights": {
       "description": 1,
@@ -161,24 +166,24 @@ module.exports = (mongoose) => {
   applicationSchema.index({
     "categories": 1,
     "name": "text",
-    "versions.reviewStatus": 1
+    "currentVersion.number": 1
   });
   applicationSchema.index({
     "categories": 1,
     "description": "text",
     "name": "text",
-    "versions.reviewStatus": 1
+    "currentVersion.number": 1
   });
   applicationSchema.index({
     "categories": 1,
     "downloadCount": 1,
-    "versions.reviewStatus": 1
+    "currentVersion.number": 1
   });
   applicationSchema.index({
     "developer.id": 1,
-    "versions.reviewStatus": 1
+    "currentVersion.number": 1
   });
-  
+
 
   return mongoose.model("Application", applicationSchema);
 };

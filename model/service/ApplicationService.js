@@ -86,7 +86,9 @@ const searchByCategory = (mongoose, Application) => {
 
     return findMany(mongoose, Application)({
       "categories": category,
-      "reviewStatus": "accepted"
+      "currentVersion.number": {
+        "$gte": 0
+      }, 
     }, "id name description featureGraphic iconLink downloadCount currentVersion screenshots categories", sort);
   };
 };
@@ -95,8 +97,9 @@ const searchByKeywords = (mongoose, Application) => {
   return (keywords, page, attrs) => {
     return new Promise((resolve, reject) => {
       Application.find({
-        "reviewStatus": "accepted",
-        "$text": {
+        "currentVersion.number": {
+          "$gte": 0
+        }, "$text": {
           "$search": keywords
         }
       }, "id name description featureGraphic iconLink downloadCount currentVersion screenshots categories", {
