@@ -5,7 +5,7 @@ module.exports = (app, mongoose, entities) => {
   const success = require("../response/success");
 
   const applicationService =
-    require("../service/ApplicationService")(mongoose, entities.Application);
+    require("../service/applicationService")(mongoose, entities.Application);
 
     const VALID_SORT_BYS = {
       "downloadcount": "downloadCount",

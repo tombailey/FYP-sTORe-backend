@@ -7,7 +7,7 @@ module.exports = (app, mongoose, entities) => {
   const success = require("../response/success");
 
   const developerService =
-    require("../service/DeveloperService")(mongoose, entities.Developer);
+    require("../service/developerService")(mongoose, entities.Developer);
 
   app.post("/api/developers", (req, res) => {
     var name = req.body.name;
