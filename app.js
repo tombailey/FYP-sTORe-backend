@@ -29,11 +29,13 @@ function setupMongoose() {
       }
     }, () => {
       var Application = require("./model/entity/application")(mongoose);
+      var Developer = require("./model/entity/developer")(mongoose);
 
       resolve({
         "mongoose": mongoose,
         "entities": {
-          "Application": Application
+          "Application": Application,
+          "Developer": Developer
         }
       });
     });
@@ -49,4 +51,5 @@ function setupExpress(database) {
 
 function setupEndpoints(app, mongoose, entities) {
   require("./model/endpoint/application")(app, mongoose, entities);
+  require("./model/endpoint/developer")(app, mongoose, entities);
 }

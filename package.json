@@ -9,6 +9,7 @@
   },
   "author": "TomBailey",
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "express": "^4.14.0",
     "http-status": "^0.2.3",
     "mongoose": "^4.7.6",
