@@ -26,6 +26,10 @@ module.exports = (mongoose) => {
   developerSchema.index({
     "registrationDate": 1
   });
+  developerSchema.index({
+    "name": 1,
+    "password": 1
+  });
 
   return mongoose.model("Developer", developerSchema);
 };

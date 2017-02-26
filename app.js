@@ -28,8 +28,10 @@ function setupMongoose() {
         "autoIndex": CONFIG.mongoose.autoIndex
       }
     }, () => {
-      var Application = require("./model/entity/application")(mongoose);
-      var Developer = require("./model/entity/developer")(mongoose);
+			var jsonSelect = require("mongoose-json-select");
+
+      var Application = require("./model/entity/application")(mongoose, jsonSelect);
+      var Developer = require("./model/entity/developer")(mongoose, jsonSelect);
 
       resolve({
         "mongoose": mongoose,
@@ -43,13 +45,31 @@ function setupMongoose() {
 }
 
 function setupExpress(database) {
+	var bodyParser = require("body-parser");
+
+	var multer  = require("multer");
+	var upload = multer({
+		"limits": {
+			"fileSize": 1024 * 1024 * 100,
+			"files": 10
+		}, "storage": multer.memoryStorage()
+	});
+
+	var storage = require("google-cloud").storage({
+		"projectId": CONFIG.google.projectId,
+		"keyFilename": "./fyp-store-backend-58a9b731e7dd.json"
+	});
+
   var app = require("express")();
-  setupEndpoints(app, database.mongoose, database.entities);
+	app.use(bodyParser.urlencoded());
+
+  setupEndpoints(app, upload, database.mongoose, database.entities,
+		storage.bucket(CONFIG.google.storage.bucketName));
   app.listen(CONFIG.express.port);
-  return app;
 }
 
-function setupEndpoints(app, mongoose, entities) {
-  require("./model/endpoint/application")(app, mongoose, entities);
+function setupEndpoints(app, upload, mongoose, entities, storageBucket) {
+  require("./model/endpoint/application")(app, upload, mongoose, entities,
+		storageBucket);
   require("./model/endpoint/developer")(app, mongoose, entities);
 }

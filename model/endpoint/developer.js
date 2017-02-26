@@ -30,10 +30,11 @@ module.exports = (app, mongoose, entities) => {
     }
 
 
-    bcrypt.hash(password, 16).then((err, hash) => {
+    bcrypt.hash(password, 16).then((hash) => {
       return developerService.create(name, hash);
     }).then((developer) => {
-      success.created({
+      success.created(res, {
+        "registered": true,
         "id": developer.id
       });
     }).catch((err) => {

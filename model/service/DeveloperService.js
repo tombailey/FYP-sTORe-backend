@@ -16,10 +16,18 @@ const create = (mongoose, Developer) => {
   };
 };
 
-const getDeveloper = (mongoose, Developer) => {
+const getById = (mongoose, Developer) => {
   return (developerId, attrs) => {
-    findOne(mongoose, Developer)({
+    return findOne(mongoose, Developer)({
       "id": developerId,
+    }, attrs);
+  };
+};
+
+const getByName = (mongoose, Developer) => {
+  return (name, attrs) => {
+    return findOne(mongoose, Developer)({
+      "name": name
     }, attrs);
   };
 };
@@ -41,6 +49,7 @@ const findOne = (mongoose, Developer) => {
 module.exports = (mongoose, Developer) => {
   return {
     "create": create(mongoose, Developer),
-    "getDeveloper": getDeveloper(mongoose, Developer)
+    "getById": getById(mongoose, Developer),
+    "getByName": getByName(mongoose, Developer)
   };
 };

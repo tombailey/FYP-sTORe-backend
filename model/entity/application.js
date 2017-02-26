@@ -1,5 +1,5 @@
 /*jshint esversion: 6 */
-module.exports = (mongoose) => {
+module.exports = (mongoose, jsonSelect) => {
   const VALID_REVIEW_STATUSES =  [
     "accepted",
     "pending",
@@ -7,8 +7,8 @@ module.exports = (mongoose) => {
   ];
   const VALID_CATEGORIES = [
     "communication",
-    "communication",
-    "communication",
+    "entertainment",
+    "shopping",
     "communication"
   ];
 
@@ -31,18 +31,16 @@ module.exports = (mongoose) => {
       }
     }, "featureGraphicLink": {
       "type": String,
-      "required": true,
       "validate": {
         "validator": (value) => {
-          return /[A-Z0-9\-\.\,\ ]{64,1024}/i.test(value);
+          return value === null || /https?\:\/\/[A-Z0-9\-\.]+\/[A-Z0-9\-\.\/]+.png/i.test(value);
         }
       }
     }, "iconLink": {
       "type": String,
-      "required": true,
       "validate": {
         "validator": (value) => {
-          return /https?\:\/\/[A-Z0-9\-\.]+\/[A-Z0-9\-\.\/]+.png/i.test(value);
+          return value === null || /https?\:\/\/[A-Z0-9\-\.]+\/[A-Z0-9\-\.\/]+.png/i.test(value);
         }
       }
     }, "downloadCount": {
@@ -52,19 +50,31 @@ module.exports = (mongoose) => {
     }, "currentVersion": {
       "number": {
         "type": Number,
-        "required": true,
-        "default": null,
       }, "date": {
         "type": Date,
-        "required": true,
-        "default": null,
       }
-    }, "screenshots": {
-      "type": [String],
-      "required": true,
-      "validate": {
-        "validator": (value) => {
-          return /https?\:\/\/[A-Z0-9\-\.]+\/[A-Z0-9\-\.\/]+.png/i.test(value);
+    }, "ratings": {
+      "count": {
+        "type": Number,
+        "required": true,
+        "default": 0
+      }, "total": {
+        "type": Number,
+        "required": true,
+        "default": 0
+      }
+    }, "screenshot": {
+      "links": {
+        "type": [String],
+        "validate": {
+          "validator": (values) => {
+            values.forEach((value) => {
+              if (!/https?\:\/\/[A-Z0-9\-\.]+\/[A-Z0-9\-\.\/]+.png/i.test(value)) {
+                return false;
+              }
+            });
+            return true;
+          }
         }
       }
     }, "versions": [{
@@ -81,7 +91,7 @@ module.exports = (mongoose) => {
           "required": true,
           "validate": {
             "validator": (value) => {
-              return /[A-Z0-9\-\.\,\ ]{64,1024}/.test(value);
+              return /https?\:\/\/[A-Z0-9\-\.]+\/[A-Z0-9\-\.\/]+.apk/i.test(value);
             }
           }
         }, "name": {
@@ -128,8 +138,13 @@ module.exports = (mongoose) => {
       "type": [String],
       "required": true,
       "validate": {
-        "validator": (value) => {
-          return VALID_CATEGORIES.indexOf(value) !== -1;
+        "validator": (values) => {
+          values.forEach((value) => {
+            if (VALID_CATEGORIES.indexOf(value) === -1) {
+              return false;
+            }
+          });
+          return true;
         }
       }
     }, "developer": {
@@ -138,11 +153,36 @@ module.exports = (mongoose) => {
         "required": true
       }
     }
+  }, {
+    "toJSON": {
+      "virtuals": true
+    }
+  });
+
+  //calculate screenshot count and don't provide direct links to screenshots
+  //from storage bucket (need to be proxied for privacy)
+  applicationSchema.virtual("screenshotCount").get(function() {
+    return this.screenshot.links.length;
+  });
+
+  //calculate average rating, rather than storing + update for each review
+  applicationSchema.virtual("rating").get(function() {
+    if (this.ratings.count > 0) {
+      return this.ratings.total / this.ratings.count;
+    } else {
+      return 0;
+    }
   });
 
 
+  //by default, show these attributes when .toJson is called
+  applicationSchema.plugin(jsonSelect, "name description downloadCount " +
+    "currentVersion rating screenshotCount reviews categories developer");
+
+
+  //index according to attribute compositions queried to speedup results
   applicationSchema.index({
-    "id": 1,
+    "_id": 1,
     "currentVersion.number": 1
   });
   applicationSchema.index({
@@ -182,6 +222,10 @@ module.exports = (mongoose) => {
   applicationSchema.index({
     "developer.id": 1,
     "currentVersion.number": 1
+  });
+  applicationSchema.index({
+    "_id": 1,
+    "developer.id": 1
   });
 
 
