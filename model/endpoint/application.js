@@ -12,9 +12,8 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
 
   const applicationService =
     require("../service/applicationService")(mongoose, entities.Application);
-
-  const developerService =
-    require("../service/developerService")(mongoose, entities.Developer);
+  const sessionService =
+    require("../service/sessionService")(mongoose, entities.Session);
 
   const cacheHeaderOverriddenRequest =
     require("../request/cacheHeaderOverriddenRequest");
@@ -98,17 +97,11 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
   });
 
   app.post("/api/applications", (req, res) => {
-    var developerName = req.body.developerName;
-    if (developerName === undefined) {
-      error.badRequest(res, "developerName is required");
+    var sessionId = req.body.sessionId;
+    if (sessionId === undefined) {
+      error.badRequest(res, "sessionId is required");
       return;
     }
-    var developerPassword = req.body.developerPassword;
-    if (developerPassword === undefined) {
-      error.badRequest(res, "developerPassword is required");
-      return;
-    }
-
 
     var name = req.body.name;
     if (name === undefined) {
@@ -126,20 +119,7 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
       return;
     }
 
-    developerService.getByName(developerName).then((developer) => {
-      return new Promise((resolve, reject) => {
-        bcrypt.compare(developerPassword, developer.password).then((passwordMatches) => {
-          if (passwordMatches) {
-            resolve(developer.id);
-          } else {
-            reject({
-              "code": 403,
-              "message": "credentials incorrect"
-            });
-          }
-        });
-      });
-    }).then((developerId) => {
+    sessionService.getSession(sessionId).then((session) => {
       return applicationService.create(name, description, [category], developerId);
     }).then((newApplication) => {
       success.created(res, {
@@ -156,50 +136,21 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
     });
   });
 
-  app.put("/api/applications/:_appId", upload.fields([
-    {
-      "name": "screenshots",
-      "maxCount": 8
-    }, {
-      "name": "featureGraphic",
-      "maxCount": 1
-    }, {
-      "name": "icon",
-      "maxCount": 1
+  app.put("/api/applications/:_appId", (req, res) => {
+    var sessionId = req.body.sessionId;
+    if (sessionId === undefined) {
+      error.badRequest(res, "sessionId is required");
+      return;
     }
-  ]), (req, res) => {
-    var appId = req.params._appId;
 
-    var developerName = req.body.developerName;
-    if (developerName === undefined) {
-      error.badRequest(res, "developerName is required");
-      return;
-    }
-    var developerPassword = req.body.developerPassword;
-    if (developerPassword === undefined) {
-      error.badRequest(res, "developerPassword is required");
-      return;
-    }
+    var appId = req.params._appId;
 
     var name = req.body.name;
     var description = req.body.description;
 
-    developerService.getByName(developerName).then((developer) => {
-      return new Promise((resolve, reject) => {
-        bcrypt.compare(developerPassword, developer.password).then((passwordMatches) => {
-          if (passwordMatches) {
-            resolve(developer._id);
-          } else {
-            reject({
-              "code": 403,
-              "message": "credentials incorrect"
-            });
-          }
-        });
-      });
-    }).then((developerId) => {
+    sessionService.getSession(sessionId).then((session) => {
       return applicationService.getApplicationByIdAndDeveloperId(appId,
-        developerId);
+        session.developer.id);
     }).then((applicationToBeUpdated) => {
       if (applicationToBeUpdated === null) {
         return Promise.reject({
@@ -207,60 +158,9 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
           "message": "application not found"
         });
       } else {
-        return Promise.resolve();
-        // return new Promise((resolve, reject) => {
-        //   if (screenshots !== undefined) {
-        //     var screenshotPromises = [];
-        //     screenshots.forEach((screenshot, index) => {
-        //       screenshotPromises.push(
-        //         store.uploadOneAndMakePublic("android/images/" + appId +
-        //         "-screen-" + index + ".png", screenshot.buffer));
-        //     });
-        //
-        //     Promise.all(screenshotPromises).then((screenshotPaths) =>  {
-        //       var screenshotLinks = [];
-        //       screenshotPaths.forEach((screenshotPath) => {
-        //         screenshotLinks.push(
-        //           "https://storage.googleapis.com/fyp-store-backend-storage/" +
-        //           screenshotPath);
-        //       });
-        //       resolve(screenshotLinks);
-        //     }).catch((err) => {
-        //       reject(err);
-        //     });
-        //   } else {
-        //     return Promise.resolve();
-        //   }
-        // });
+
       }
-    })/*.then((screenshotLinks) => {
-      if (featureGraphic !== undefined) {
-        return new Promise((resolve, reject) => {
-          store.uploadOneAndMakePublic("android/images/" + appId +
-            "-featuregraphic.png", featureGraphic.buffer)
-            .then((featureGraphicLink) => {
-              resolve(screenshotLinks, featureGraphicLink);
-            }).catch((err) => {
-              reject(err);
-            });
-        });
-      } else {
-        return Promise.resolve(screenshotLinks);
-      }
-    }).then((screenshotLinks, featureGraphicLink) => {
-      if (icon !== undefined) {
-        return new Promise((resolve, reject) => {
-          store.uploadOneAndMakePublic("android/images/" + appId + "-icon.png",
-            icon.buffer).then((iconLink) => {
-              resolve(screenshotLinks, featureGraphicLink, iconLink);
-            }).catch((err) => {
-              reject(err);
-            });
-        });
-      } else {
-        return Promise.resolve(screenshotLinks, featureGraphicLink);
-      }
-    })*/.then(() => {
+    }).then(() => {
       return applicationService.update(appId, {
         "name": name,
         "description": description
@@ -299,14 +199,9 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
   const uploadAndUpdate = (req, res, fileName, filePath, attribute) => {
     var appId = req.params._appId;
 
-    var developerName = req.body.developerName;
-    if (developerName === undefined) {
-      error.badRequest(res, "developerName is required");
-      return;
-    }
-    var developerPassword = req.body.developerPassword;
-    if (developerPassword === undefined) {
-      error.badRequest(res, "developerPassword is required");
+    var sessionId = req.body.sessionId;
+    if (sessionId === undefined) {
+      error.badRequest(res, "sessionId is required");
       return;
     }
 
@@ -315,29 +210,9 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
       file = file[0];
     }
 
-    developerService.getByName(developerName).then((developer) => {
-      if (developer === null) {
-        return Promise.reject({
-          "code": 403,
-          "message": "credentials incorrect"
-        });
-      } else {
-        return new Promise((resolve, reject) => {
-          bcrypt.compare(developerPassword, developer.password).then((passwordMatches) => {
-            if (passwordMatches) {
-              resolve(developer._id);
-            } else {
-              reject({
-                "code": 403,
-                "message": "credentials incorrect"
-              });
-            }
-          });
-        });
-      }
-    }).then((developerId) => {
+    sessionService.getSession(sessionId).then((session) => {
       return applicationService.getApplicationByIdAndDeveloperId(appId,
-        developerId);
+        session.developer.id);
     }).then((applicationToBeUpdated) => {
       if (applicationToBeUpdated === null) {
         return Promise.reject({
@@ -447,14 +322,9 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
   const uploadAndUpdateScreenshot = (req, res, screenshotNumber) => {
     var appId = req.params._appId;
 
-    var developerName = req.body.developerName;
-    if (developerName === undefined) {
-      error.badRequest(res, "developerName is required");
-      return;
-    }
-    var developerPassword = req.body.developerPassword;
-    if (developerPassword === undefined) {
-      error.badRequest(res, "developerPassword is required");
+    var sessionId = req.body.sessionId;
+    if (sessionId === undefined) {
+      error.badRequest(res, "sessionId is required");
       return;
     }
 
@@ -463,29 +333,9 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
       screenshot = screenshot[0];
     }
 
-    developerService.getByName(developerName).then((developer) => {
-      if (developer === null) {
-        return Promise.reject({
-          "code": 403,
-          "message": "credentials incorrect"
-        });
-      } else {
-        return new Promise((resolve, reject) => {
-          bcrypt.compare(developerPassword, developer.password).then((passwordMatches) => {
-            if (passwordMatches) {
-              resolve(developer._id);
-            } else {
-              reject({
-                "code": 403,
-                "message": "credentials incorrect"
-              });
-            }
-          });
-        });
-      }
-    }).then((developerId) => {
+    sessionService.getSession(sessionId).then((session) => {
       return applicationService.getApplicationByIdAndDeveloperId(appId,
-        developerId);
+        session.developer.id);
     }).then((applicationToBeUpdated) => {
       if (applicationToBeUpdated === null) {
         return Promise.reject({
@@ -588,14 +438,9 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
   ]), (req, res) => {
     var appId = req.params._appId;
 
-    var developerName = req.body.developerName;
-    if (developerName === undefined) {
-      error.badRequest(res, "developerName is required");
-      return;
-    }
-    var developerPassword = req.body.developerPassword;
-    if (developerPassword === undefined) {
-      error.badRequest(res, "developerPassword is required");
+    var sessionId = req.body.sessionId;
+    if (sessionId === undefined) {
+      error.badRequest(res, "sessionId is required");
       return;
     }
 
@@ -622,24 +467,9 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
       return;
     }
 
-    developerService.getByName(developerName).then((developer) => {
-      return new Promise((resolve, reject) => {
-        bcrypt.compare(developerPassword, developer.password).then((passwordMatches) => {
-          if (passwordMatches) {
-            resolve(developer._id);
-          } else {
-            reject({
-              "code": 403,
-              "message": "credentials incorrect"
-            });
-          }
-        }).catch((err) => {
-          reject(err);
-        });
-      });
-    }).then((developerId) => {
+    sessionService.getSession(sessionId).then((session) => {
       return applicationService.getApplicationByIdAndDeveloperId(appId,
-        developerId);
+        session.developer.id);
     }).then((applicationToBeUpdated) => {
       if (applicationToBeUpdated === null) {
         return Promise.reject({

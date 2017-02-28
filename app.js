@@ -29,15 +29,18 @@ function setupMongoose() {
       }
     }, () => {
 			var jsonSelect = require("mongoose-json-select");
+			var uuid = require("uuid/v4");
 
       var Application = require("./model/entity/application")(mongoose, jsonSelect);
       var Developer = require("./model/entity/developer")(mongoose, jsonSelect);
+      var Session = require("./model/entity/session")(mongoose, uuid);
 
       resolve({
         "mongoose": mongoose,
         "entities": {
           "Application": Application,
-          "Developer": Developer
+          "Developer": Developer,
+					"Session": Session
         }
       });
     });
