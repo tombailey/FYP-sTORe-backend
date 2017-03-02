@@ -3,7 +3,7 @@ module.exports = (mongoose, uuidV4) => {
 
   var sessionSchema = new mongoose.Schema({
     "_id": {
-      "type": mongoose.Schema.Types.UUID,
+      "type": String,
       "default": uuidV4()
     }, "validUntil": {
       "type": Date,
