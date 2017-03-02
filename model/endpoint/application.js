@@ -48,7 +48,7 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
     }
 
     applicationService.searchByCategory(category, sortBy, sortDirection, page).then((applications) => {
-      success.ok(res, applications);
+      success.ok(res, applications, cache.private().hours(1));
     }).catch((err) => {
       console.error(err);
       error.internalServerError(res, "database issue");
@@ -57,7 +57,7 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
 
   const searchByKeywords = (req, res, keywords, page) => {
     applicationService.searchByKeywords(keywords, page).then((applications) => {
-      success.ok(res, applications);
+      success.ok(res, applications, cache.private().hours(1));
     }).catch((err) => {
       console.error(err);
       error.internalServerError(res, "database issue");
@@ -89,7 +89,7 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
   app.get("/api/applications/:_appId", (req, res) => {
     var appId = req.params._appId;
     applicationService.getApplication(appId).then((application) => {
-      success.ok(res, application);
+      success.ok(res, application, cache.private().hours(1));
     }).catch((err) => {
       console.error(err);
       error.internalServerError(res, "database issue");
