@@ -5,7 +5,9 @@ const SECS_IN_DAY = 24 * SECS_IN_HOUR;
 
 const times = (modifier) => {
   return {
-    "days": (x) => {
+    "hours": (x) => {
+      return modifier + ", max-age=" + (SECS_IN_HOUR * x);
+    }, "days": (x) => {
       return modifier + ", max-age=" + (SECS_IN_DAY * x);
     }
   };
