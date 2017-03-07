@@ -172,4 +172,67 @@ describe("tests", () => {
     });
   });
 
+  describe("error", () => {
+    describe("#error", () => {
+      it("should produce correct error code", () => {
+        //arrange
+        var expectedCode = 420;
+
+        var mockResponse = {
+          "json": () => {
+            //ignored
+          },
+          "status": (code) => {
+            expect(code).to.equal(expectedCode);
+            return mockResponse;
+          }
+        };
+
+        //act
+        error.error(mockResponse, {
+          "code": expectedCode,
+          "message": "something bad happened"
+        });
+
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("error", () => {
+    describe("#error", () => {
+      it("should produce correct error json", () => {
+        //arrange
+        var expectedCode = 420;
+        var expectedMessage = "something bad happened";
+
+        var mockResponse = {
+          "json": (data) => {
+            expect(data).to.deep.equal({
+              "errors": [{
+                "code": expectedCode,
+                "message": expectedMessage
+              }]
+            });
+          },
+          "status": (code) => {
+            return mockResponse;
+          }
+        };
+
+        //act
+        error.error(mockResponse, {
+          "code": expectedCode,
+          "message": expectedMessage
+        });
+
+
+        //assert
+
+      });
+    });
+  });
+
 });
