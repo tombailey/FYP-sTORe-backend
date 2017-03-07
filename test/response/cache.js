@@ -62,7 +62,9 @@ describe("tests", () => {
         });
       });
     });
-  });describe("cache", () => {
+  });
+
+  describe("cache", () => {
     describe("#private", () => {
       describe("#days", () => {
         it("should produce private cache header for 7 days", () => {
@@ -73,6 +75,84 @@ describe("tests", () => {
 
           //act
           var actual = cache.private().days(7);
+
+
+          //assert
+          expect(actual).to.eql(expected);
+        });
+      });
+    });
+  });
+
+  describe("cache", () => {
+    describe("#public", () => {
+      describe("#hours", () => {
+        it("should produce public cache header for 1 hour", () => {
+          //arrange
+
+          //the number of seconds in an hour
+          var expected = "public, max-age=3600";
+
+          //act
+          var actual = cache.public().hours(1);
+
+
+          //assert
+          expect(actual).to.eql(expected);
+        });
+      });
+    });
+  });
+
+  describe("cache", () => {
+    describe("#public", () => {
+      describe("#hours", () => {
+        it("should produce public cache header for 12 hours", () => {
+          //arrange
+
+          //the number of seconds in 12 hours
+          var expected = "public, max-age=43200";
+
+          //act
+          var actual = cache.public().hours(12);
+
+
+          //assert
+          expect(actual).to.eql(expected);
+        });
+      });
+    });
+  });
+
+  describe("cache", () => {
+    describe("#private", () => {
+      describe("#hours", () => {
+        it("should produce private cache header for 1 hour", () => {
+          //arrange
+
+          //the number of seconds in an hour
+          var expected = "private, max-age=3600";
+
+          //act
+          var actual = cache.private().hours(1);
+
+
+          //assert
+          expect(actual).to.eql(expected);
+        });
+      });
+    });
+  });describe("cache", () => {
+    describe("#private", () => {
+      describe("#hours", () => {
+        it("should produce private cache header for 12 hours", () => {
+          //arrange
+
+          //the number of seconds in 12 hours
+          var expected = "private, max-age=43200";
+
+          //act
+          var actual = cache.private().hours(12);
 
 
           //assert
