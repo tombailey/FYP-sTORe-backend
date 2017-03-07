@@ -15,7 +15,7 @@ const error = (res, error) => {
   if (error.code && error.message) {
     errorResponse(res, error.code, error.message);
   } else {
-    errorResponse(res, 500, message);
+    errorResponse(res, 500, "internal server error");
   }
 };
 
