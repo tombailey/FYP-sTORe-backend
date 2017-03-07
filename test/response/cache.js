@@ -65,7 +65,7 @@ describe("tests", () => {
   });describe("cache", () => {
     describe("#private", () => {
       describe("#days", () => {
-        it("should produce private cache header for 1 day", () => {
+        it("should produce private cache header for 7 days", () => {
           //arrange
 
           //the number of seconds in a week
