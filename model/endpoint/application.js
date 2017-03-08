@@ -126,7 +126,7 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
 
     sessionService.getSession(sessionId).then((session) => {
       //TODO: check for duplicate package name
-      return applicationService.create(name, description, [category], developerId);
+      return applicationService.create(name, description, [category], session.developer.id);
     }).then((newApplication) => {
       success.created(res, {
         "registered": true
