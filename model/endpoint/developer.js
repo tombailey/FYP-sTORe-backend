@@ -66,9 +66,9 @@ module.exports = (app, mongoose, entities) => {
     }
 
 
-    developerService.getByName(developerName).then((developer) => {
+    developerService.getByName(name).then((developer) => {
       return new Promise((resolve, reject) => {
-        bcrypt.compare(developerPassword, developer.password).then((passwordMatches) => {
+        bcrypt.compare(password, developer.password).then((passwordMatches) => {
           if (passwordMatches) {
             resolve(developer.id);
           } else {
