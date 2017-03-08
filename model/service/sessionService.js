@@ -3,7 +3,9 @@ const create = (mongoose, Session) => {
   return (developerId) => {
     return new Promise((resolve, reject) => {
       Session.create({
-        "validUntil": Date.now()
+        "developer": {
+          "id": developerId
+        }, "validUntil": Date.now()
       }, (error, session) => {
         if (error) {
           reject(error);
