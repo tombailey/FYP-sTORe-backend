@@ -4,9 +4,10 @@ const DEFAULT_ATTRS = "_id name description downloadCount currentVersion " +
 
 
 const create = (mongoose, Application) => {
-  return (name, description, categories, developerId) => {
+  return (packageName, name, description, categories, developerId) => {
     return new Promise((resolve, reject) => {
       Application.create({
+        "_id": packageName,
         "name": name,
         "description": description,
         "featureGraphicLink": null,

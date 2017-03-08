@@ -103,6 +103,11 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
       return;
     }
 
+    var packageName = req.body.packageName;
+    if (packageName === undefined) {
+      error.badRequest(res, "packageName is required");
+      return;
+    }
     var name = req.body.name;
     if (name === undefined) {
       error.badRequest(res, "name is required");
@@ -120,11 +125,11 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
     }
 
     sessionService.getSession(sessionId).then((session) => {
+      //TODO: check for duplicate package name
       return applicationService.create(name, description, [category], developerId);
     }).then((newApplication) => {
       success.created(res, {
-        "registered": true,
-        "appId": newApplication.id
+        "registered": true
       });
     }).catch((err) => {
       console.error(err);

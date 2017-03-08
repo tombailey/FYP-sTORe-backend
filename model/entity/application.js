@@ -13,7 +13,10 @@ module.exports = (mongoose, jsonSelect) => {
   ];
 
   var applicationSchema = new mongoose.Schema({
-    "name": {
+    "_id": {
+      "type": String,
+      "required": true
+    }, "name": {
       "type": String,
       "required": true,
       "validate": {
@@ -176,7 +179,7 @@ module.exports = (mongoose, jsonSelect) => {
 
 
   //by default, show these attributes when .toJson is called
-  applicationSchema.plugin(jsonSelect, "name description downloadCount " +
+  applicationSchema.plugin(jsonSelect, "_id name description downloadCount " +
     "currentVersion rating screenshotCount reviews categories developer");
 
 
