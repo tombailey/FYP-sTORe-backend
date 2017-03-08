@@ -53,6 +53,7 @@ function setupExpress(database) {
 	var multer  = require("multer");
 	var upload = multer({
 		"limits": {
+			//100mb limit
 			"fileSize": 1024 * 1024 * 100,
 			"files": 10
 		}, "storage": multer.memoryStorage()
@@ -64,7 +65,10 @@ function setupExpress(database) {
 	});
 
   var app = require("express")();
-	app.use(bodyParser.urlencoded());
+	app.use(bodyParser.urlencoded({
+		//1mb limit
+		"limit": 1024 * 1024
+	}));
 
   setupEndpoints(app, upload, database.mongoose, database.entities,
 		storage.bucket(CONFIG.google.storage.bucketName));
