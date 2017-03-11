@@ -4,10 +4,12 @@ module.exports = (mongoose) => {
   var developerSchema = new mongoose.Schema({
     "name": {
       "type": String,
+      "unique": true,
       "required": true,
       "validate": {
         "validator": (value) => {
-          return /[A-Z0-9\-\ ]{4,32}/i.test(value);
+          //enforce lowercase with unique constraint to avoid duplicates
+          return /[a-z0-9\-\ ]{4,32}/.test(value);
         }
       }
     }, "password": {

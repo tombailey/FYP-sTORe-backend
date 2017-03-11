@@ -3,7 +3,7 @@ const create = (mongoose, Developer) => {
   return (name, encryptedPassword) => {
     return new Promise((resolve, reject) => {
       Developer.create({
-        "name": name,
+        "name": name.toLowerCase(),
         "password": encryptedPassword
       }, (error, developer) => {
         if (error) {
@@ -27,7 +27,7 @@ const getById = (mongoose, Developer) => {
 const getByName = (mongoose, Developer) => {
   return (name, attrs) => {
     return findOne(mongoose, Developer)({
-      "name": name
+      "name": name.toLowerCase()
     }, attrs);
   };
 };
