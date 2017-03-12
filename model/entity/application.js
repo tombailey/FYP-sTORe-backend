@@ -121,7 +121,7 @@ module.exports = (mongoose, jsonSelect) => {
           "required": true,
           "validate": {
             "validator": (value) => {
-              return /[A-Z0-9\-\.\,\ ]{64,1024}/i.test(value);
+              return /[A-Z0-9\-\.\,\ ]{16,1024}/i.test(value);
             }
           }
         }, "stars": {
