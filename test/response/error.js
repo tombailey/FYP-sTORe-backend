@@ -235,4 +235,53 @@ describe("tests", () => {
     });
   });
 
+  describe("error", () => {
+    describe("#error", () => {
+      it("should produce 500 error code when bad error provided", () => {
+        //arrange
+        var expectedCode = 500;
+
+        var mockResponse = {
+          "json": (data) => {
+            expect(data.errors[0].code).to.equal(expectedCode);
+          },
+          "status": (code) => {
+            expect(code).to.equal(expectedCode);
+            return mockResponse;
+          }
+        };
+
+        //act
+        error.error(mockResponse, {});
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("error", () => {
+    describe("#error", () => {
+      it("should produce 'internal server error' message when bad error provided", () => {
+        //arrange
+        var expectedMessage = "internal server error";
+
+        var mockResponse = {
+          "json": (data) => {
+            expect(data.errors[0].message).to.equal(expectedMessage);
+          },
+          "status": () => {
+            return mockResponse;
+          }
+        };
+
+        //act
+        error.error(mockResponse, {});
+
+        //assert
+
+      });
+    });
+  });
+
 });
