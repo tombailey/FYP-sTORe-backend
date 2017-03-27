@@ -10,7 +10,7 @@ describe("tests", () => {
         //arrange
         var mockResponse = {
           "json": () => {
-
+            //ignored
           },
           "status": (code) => {
             expect(code).to.equal(201);
@@ -41,7 +41,7 @@ describe("tests", () => {
               "data": expectedData
             });
           },
-          "status": (code) => {
+          "status": () => {
             return mockResponse;
           }
         };
@@ -57,12 +57,40 @@ describe("tests", () => {
   });
 
   describe("success", () => {
+    describe("#created", () => {
+      it("should set cache header when provided", () => {
+        //arrange
+        var expectedCache = 42;
+        var mockResponse = {
+          "json": () => {
+            //ignored
+          },
+          "status": () => {
+            return mockResponse;
+          },
+          "set": (name, value) => {
+            expect(name).to.equal("Cache-control");
+            expect(value).to.equal(expectedCache);
+          }
+        };
+
+        //act
+        success.created(mockResponse, null, expectedCache);
+
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("success", () => {
     describe("#ok", () => {
       it("should produce 200 status code", () => {
         //arrange
         var mockResponse = {
           "json": () => {
-
+            //ignored
           },
           "status": (code) => {
             expect(code).to.equal(200);
@@ -93,13 +121,41 @@ describe("tests", () => {
               "data": expectedData
             });
           },
-          "status": (code) => {
+          "status": () => {
             return mockResponse;
           }
         };
 
         //act
         success.ok(mockResponse, expectedData);
+
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("success", () => {
+    describe("#ok", () => {
+      it("should set cache header when provided", () => {
+        //arrange
+        var expectedCache = 42;
+        var mockResponse = {
+          "json": () => {
+            //ignored
+          },
+          "status": () => {
+            return mockResponse;
+          },
+          "set": (name, value) => {
+            expect(name).to.equal("Cache-control");
+            expect(value).to.equal(expectedCache);
+          }
+        };
+
+        //act
+        success.ok(mockResponse, null, expectedCache);
 
 
         //assert
