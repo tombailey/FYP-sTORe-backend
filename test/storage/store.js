@@ -595,7 +595,7 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany(expectedPaths, [null]).then(() => {
+        store.uploadManyAndMakePublic(expectedPaths, [null]).then(() => {
           //assert
           expect(actualPaths).to.equal(expectedPaths);
         });
@@ -629,7 +629,7 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany(expectedPaths, [null, null]).then(() => {
+        store.uploadManyAndMakePublic(expectedPaths, [null, null]).then(() => {
           //assert
           expect(actualPaths).to.equal(expectedPaths);
         });
@@ -662,7 +662,7 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany([null], expetedBuffers).then(() => {
+        store.uploadManyAndMakePublic([null], expetedBuffers).then(() => {
           //assert
           expect(actualBuffers).to.equal(expetedBuffers);
         });
@@ -695,7 +695,7 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany([null, null], expectedBuffers).then(() => {
+        store.uploadManyAndMakePublic([null, null], expectedBuffers).then(() => {
           //assert
           expect(actualBuffers).to.equal(expectedBuffers);
         });
@@ -729,7 +729,7 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany(expectedPaths, [null]).then(() => {
+        store.uploadManyAndMakePublic(expectedPaths, [null]).then(() => {
           //assert
           expect(actualPaths).to.equal(expectedPaths);
         });
@@ -763,7 +763,7 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany(expectedPaths, [null, null]).then(() => {
+        store.uploadManyAndMakePublic(expectedPaths, [null, null]).then(() => {
           //assert
           expect(actualPaths).to.equal(expectedPaths);
         });
