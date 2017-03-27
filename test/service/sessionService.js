@@ -7,10 +7,16 @@ describe("tests", () => {
       it("should create session for developer with correct id", () => {
         //arrange
         var expectedDeveloperId = 42;
+        var mockSession = {
+          "create": (attrs, callback) => {
+            expect(attrs.developer.id).to.equal(expectedDeveloperId);
+            callback(undefined, {});
+          }
+        };
 
         //act
-        var sessionService = require("../../model/service/sessionService")();
-        sessionService.create(expectedDeveloperId).then(() => {
+        var sessionService = require("../../model/service/sessionService")(null, mockSession);
+        return sessionService.create(expectedDeveloperId).then(() => {
 
         });
 
@@ -38,8 +44,8 @@ describe("tests", () => {
         };
 
         //act
-        var sessionService = require("../../model/service/sessionService")();
-        sessionService.create(expectedSession.developer.id).then((session) => {
+        var sessionService = require("../../model/service/sessionService")(null, mockSession);
+        return sessionService.create(expectedSession.developer.id).then((session) => {
           expect(session).to.deep.equal(expectedSession);
         });
 
@@ -66,7 +72,7 @@ describe("tests", () => {
         //act
         var sessionService = require("../../model/service/sessionService")
           (null, mockSession);
-        sessionService.create(42).then(() => {
+        return sessionService.create(42).then(() => {
           throw "";
         }).catch((error) => {
           expect(error).to.deep.equal(expectedError);
@@ -85,17 +91,18 @@ describe("tests", () => {
         var expectedId = 42;
 
         var mockSession = {
-          "findOne": (searchQuery) => {
+          "findOne": (searchQuery, projection, callback) => {
             expect(searchQuery).to.deep.equal({
               "_id": expectedId
             });
+            callback(undefined, {});
           }
         };
 
         //act
         var sessionService = require("../../model/service/sessionService")
           (null, mockSession);
-        sessionService.getSession(expectedId);
+        return sessionService.getSession(expectedId);
 
         //assert
 
@@ -108,15 +115,16 @@ describe("tests", () => {
       it("should get session with correct attributes", () => {
         //arrange
         var mockSession = {
-          "findOne": (searchQuery, attrs) => {
-            expect(attrs).to.equal("developer.id");
+          "findOne": (searchQuery, projection, callback) => {
+            expect(projection).to.equal("developer.id");
+            callback(undefined, {});
           }
         };
 
         //act
         var sessionService = require("../../model/service/sessionService")
           (null, mockSession);
-        sessionService.getSession(42);
+        return sessionService.getSession(42);
 
         //assert
 
@@ -144,7 +152,7 @@ describe("tests", () => {
         //act
         var sessionService = require("../../model/service/sessionService")
           (null, mockSession);
-        sessionService.getSession(42).then((session) => {
+        return sessionService.getSession(42).then((session) => {
           expect(session).to.deep.equal(expectedSession);
         });
 
@@ -171,7 +179,7 @@ describe("tests", () => {
         //act
         var sessionService = require("../../model/service/sessionService")
           (null, mockSession);
-        sessionService.getSession(42).then((session) => {
+        return sessionService.getSession(42).then((session) => {
           throw "";
         }).catch((error) => {
           expect(error).to.deep.equal(expectedError);
