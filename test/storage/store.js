@@ -8,13 +8,14 @@ describe("tests", () => {
         //arrange
         var expectedPath = "example/image/42.png";
         var mockGoogleStorage = {
-          "file": (actualPath) => {
-            expect(actualPath).to.eql(expectedPath);
+          "file": (path) => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback(path);
+                    }
                   }, "end": () => {
                     //ignored
                   }
@@ -26,8 +27,8 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadOne(expectedPath, null).then(() => {
-          return;
+        return store.uploadOne(expectedPath, null).then((actualPath) => {
+          expect(actualPath).to.equal(expectedPath);
         });
 
         //assert
@@ -46,8 +47,10 @@ describe("tests", () => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": (actualBuffer) => {
                     expect(actualBuffer).to.eql(expectedBuffer);
                   }
@@ -59,8 +62,8 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadOne(null, expectedBuffer).then(() => {
-          return;
+        return store.uploadOne(null, expectedBuffer).then(() => {
+
         });
 
         //assert
@@ -74,13 +77,21 @@ describe("tests", () => {
       it("should subscribe for errors when uploading a file", () => {
         //arrange
         var expectedEvent = "error";
+        var wasExpectedEventSeen = false;
+
         var mockGoogleStorage = {
           "file": () => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": (actualEvent) => {
-                    expect(actualEvent).to.eql(expectedEvent);
+                  "on": (actualEvent, callback) => {
+                    if (actualEvent == expectedEvent) {
+                      wasExpectedEventSeen = true;
+                    }
+
+                    if (actualEvent == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     //ignored
                   }
@@ -92,8 +103,8 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadOne(null, null).then(() => {
-          return;
+        return store.uploadOne(null, null).then(() => {
+          expect(wasExpectedEventSeen).to.equal(true);
         });
 
         //assert
@@ -107,13 +118,21 @@ describe("tests", () => {
       it("should subscribe for success when uploading a file", () => {
         //arrange
         var expectedEvent = "finish";
+        var wasExpectedEventSeen = false;
+
         var mockGoogleStorage = {
           "file": () => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": (actualEvent) => {
-                    expect(actualEvent).to.eql(expectedEvent);
+                  "on": (actualEvent, callback) => {
+                    if (actualEvent == expectedEvent) {
+                      wasExpectedEventSeen = true;
+                    }
+
+                    if (actualEvent == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     //ignored
                   }
@@ -125,8 +144,8 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadOne(null, null).then(() => {
-          return;
+        return store.uploadOne(null, null).then(() => {
+          expect(wasExpectedEventSeen).to.equal(true);
         });
 
         //assert
@@ -141,12 +160,12 @@ describe("tests", () => {
         //arrange
         var expectedPath = "example/image/42.png";
         var mockGoogleStorage = {
-          "file": (actualPath) => {
-            expect(actualPath).to.eql(expectedPath);
+          "file": (path) => {
             return {
               "makePublic": () => {
                 return {
-                  "then": () => {
+                  "then": (callback) => {
+                    callback(path);
                     return {
                       "catch": () => {
                         //ignored
@@ -161,8 +180,8 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.makePublic(expectedPath).then(() => {
-          return;
+        return store.makePublic(expectedPath).then((actualPath) => {
+          expect(actualPath).to.eql(expectedPath);
         });
 
         //assert
@@ -175,7 +194,8 @@ describe("tests", () => {
     describe("#makePublic", () => {
       it("should subscribe for errors when making a file public", () => {
         //arrange
-        var wasCatchUsed = false;
+        var expectedError = 42;
+
         var mockGoogleStorage = {
           "file": () => {
             return {
@@ -183,8 +203,8 @@ describe("tests", () => {
                 return {
                   "then": () => {
                     return {
-                      "catch": () => {
-                        wasCatchUsed = true;
+                      "catch": (callback) => {
+                        callback(expectedError);
                       }
                     };
                   }
@@ -197,8 +217,9 @@ describe("tests", () => {
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
         store.makePublic(null).then(() => {
-          //assert
-          expect(wasCatchUsed).to.eql(true);
+          throw "catch was not used";
+        }).catch((actualError) => {
+          expect(actualError).to.equal(expectedError);
         });
       });
     });
@@ -208,14 +229,13 @@ describe("tests", () => {
     describe("#makePublic", () => {
       it("should subscribe for success when making a file public", () => {
         //arrange
-        var wasThenUsed = false;
         var mockGoogleStorage = {
           "file": () => {
             return {
               "makePublic": () => {
                 return {
-                  "then": () => {
-                    wasThenUsed = true;
+                  "then": (callback) => {
+                    callback();
                     return {
                       "catch": () => {
                         //ignored
@@ -230,10 +250,7 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.makePublic(null).then(() => {
-          //assert
-          expect(wasThenUsed).to.eql(true);
-        });
+        return store.makePublic(null);
       });
     });
   });
@@ -246,20 +263,22 @@ describe("tests", () => {
 
         var mockGoogleStorage = {
           "file": (actualPath) => {
-            expect(actualPath).to.eql(expectedPath);
+            expect(actualPath).to.equal(expectedPath);
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     //ignored
                   }
                 };
               }, "makePublic": () => {
                 return {
-                  "then": () => {
-                    wasThenUsed = true;
+                  "then": (callback) => {
+                    callback();
                     return {
                       "catch": () => {
                         //ignored
@@ -274,7 +293,7 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadOneAndMakePublic(expectedPath, null);
+        return store.uploadOneAndMakePublic(expectedPath, null);
 
         //assert
 
@@ -293,16 +312,18 @@ describe("tests", () => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": (actualBuffer) => {
                     expect(actualBuffer).to.eql(expectedBuffer);
                   }
                 };
               }, "makePublic": () => {
                 return {
-                  "then": () => {
-                    wasThenUsed = true;
+                  "then": (callback) => {
+                    callback();
                     return {
                       "catch": () => {
                         //ignored
@@ -317,7 +338,7 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadOneAndMakePublic(null, expectedBuffer);
+        return store.uploadOneAndMakePublic(null, expectedBuffer);
 
         //assert
 
@@ -337,16 +358,18 @@ describe("tests", () => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     //ignored
                   }
                 };
               }, "makePublic": () => {
                 return {
-                  "then": () => {
-                    wasThenUsed = true;
+                  "then": (callback) => {
+                    callback(actualPath);
                     return {
                       "catch": () => {
                         //ignored
@@ -361,7 +384,7 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadOneAndMakePublic(expectedPath, null);
+        return store.uploadOneAndMakePublic(expectedPath, null);
 
         //assert
 
@@ -380,8 +403,10 @@ describe("tests", () => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     uploadsAttempted++;
                   }
@@ -393,7 +418,7 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany([null], [null]).then(() => {
+        return store.uploadMany([null], [null]).then(() => {
           //assert
           expect(uploadsAttempted).to.eql(1);
         });
@@ -412,8 +437,10 @@ describe("tests", () => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     uploadsAttempted++;
                   }
@@ -425,9 +452,9 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany([null, null], [null, null]).then(() => {
+        return store.uploadMany([null, null], [null, null]).then(() => {
           //assert
-          expect(uploadsAttempted).to.eql(2);
+          expect(uploadsAttempted).to.equal(2);
         });
       });
     });
@@ -444,11 +471,11 @@ describe("tests", () => {
           "file": (path) => {
             return {
               "createWriteStream": () => {
-                //remove path from expected path
-                actualPaths.push(path);
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     //ignored
                   }
@@ -460,9 +487,9 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany(expectedPaths, [null]).then(() => {
+        return store.uploadMany(expectedPaths, [null]).then((actualPaths) => {
           //assert
-          expect(expectedPaths.length).to.eql(0);
+          expect(actualPaths).to.eql(expectedPaths);
         });
       });
     });
@@ -473,17 +500,16 @@ describe("tests", () => {
       it("should attempt to upload 2 files using the correct paths given 2 files", () => {
         //arrange
         var expectedPaths = ["example/image/1.png", "example/image/2.png"];
-        var actualPaths = [];
 
         var mockGoogleStorage = {
           "file": (path) => {
             return {
               "createWriteStream": () => {
-                //remove path from expected path
-                actualPaths.push(path);
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     //ignored
                   }
@@ -495,9 +521,9 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany(expectedPaths, [null, null]).then(() => {
+        return store.uploadMany(expectedPaths, [null, null]).then((actualPaths) => {
           //assert
-          expect(actualPaths).to.eqlual(expectedPaths);
+          expect(actualPaths).to.eql(expectedPaths);
         });
       });
     });
@@ -515,8 +541,10 @@ describe("tests", () => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": (actualBuffer) => {
                     actualBuffers.push(actualBuffer);
                   }
@@ -528,9 +556,9 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany([null], expectedBuffers).then(() => {
+        return store.uploadMany([null], expectedBuffers).then(() => {
           //assert
-          expect(actualBuffers).to.equal(expectedBuffers);
+          expect(actualBuffers).to.eql(expectedBuffers);
         });
       });
     });
@@ -548,8 +576,10 @@ describe("tests", () => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": (actualBuffer) => {
                     actualBuffers.push(actualBuffer);
                   }
@@ -561,9 +591,9 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadMany([null, null], expectedBuffers).then(() => {
+        return store.uploadMany([null, null], expectedBuffers).then(() => {
           //assert
-          expect(actualBuffers).to.equal(expectedBuffers);
+          expect(actualBuffers).to.eql(expectedBuffers);
         });
       });
     });
@@ -574,18 +604,29 @@ describe("tests", () => {
       it("should attempt a file upload using the correct path given 1 file", () => {
         //arrange
         var expectedPaths = ["example/image/42.png"];
-        var actualPaths = [];
 
         var mockGoogleStorage = {
           "file": (path) => {
-            actualPaths.push(path);
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     //ignored
+                  }
+                };
+              }, "makePublic": () => {
+                return {
+                  "then": (callback) => {
+                    callback(path);
+                    return {
+                      "catch": () => {
+                        //ignored
+                      }
+                    };
                   }
                 };
               }
@@ -595,9 +636,9 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadManyAndMakePublic(expectedPaths, [null]).then(() => {
+        return store.uploadManyAndMakePublic(expectedPaths, [null]).then((actualPaths) => {
           //assert
-          expect(actualPaths).to.equal(expectedPaths);
+          expect(actualPaths).to.eql(expectedPaths);
         });
       });
     });
@@ -612,14 +653,26 @@ describe("tests", () => {
 
         var mockGoogleStorage = {
           "file": (path) => {
-            actualPaths.push(path);
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     //ignored
+                  }
+                };
+              }, "makePublic": () => {
+                return {
+                  "then": (callback) => {
+                    callback(path);
+                    return {
+                      "catch": () => {
+                        //ignored
+                      }
+                    };
                   }
                 };
               }
@@ -629,9 +682,9 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadManyAndMakePublic(expectedPaths, [null, null]).then(() => {
+        return store.uploadManyAndMakePublic(expectedPaths, [null, null]).then((actualPaths) => {
           //assert
-          expect(actualPaths).to.equal(expectedPaths);
+          expect(actualPaths).to.eql(expectedPaths);
         });
       });
     });
@@ -641,7 +694,7 @@ describe("tests", () => {
     describe("#uploadManyAndMakePublic", () => {
       it("should attempt a file upload using the correct buffer given 1 file", () => {
         //arrange
-        var expetedBuffers = [[1,0,1,0,1,0]];
+        var expectedBuffers = [[1,0,1,0,1,0]];
         var actualBuffers = [];
 
         var mockGoogleStorage = {
@@ -649,10 +702,23 @@ describe("tests", () => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": (actualBuffer) => {
                     actualBuffers.push(actualBuffer);
+                  }
+                };
+              }, "makePublic": () => {
+                return {
+                  "then": (callback) => {
+                    callback(path);
+                    return {
+                      "catch": () => {
+                        //ignored
+                      }
+                    };
                   }
                 };
               }
@@ -662,9 +728,9 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadManyAndMakePublic([null], expetedBuffers).then(() => {
+        return store.uploadManyAndMakePublic([null], expectedBuffers).then(() => {
           //assert
-          expect(actualBuffers).to.equal(expetedBuffers);
+          expect(actualBuffers).to.eql(expectedBuffers);
         });
       });
     });
@@ -682,10 +748,23 @@ describe("tests", () => {
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": (actualBuffer) => {
                     actualBuffers.push(actualBuffer);
+                  }
+                };
+              }, "makePublic": () => {
+                return {
+                  "then": (callback) => {
+                    callback(path);
+                    return {
+                      "catch": () => {
+                        //ignored
+                      }
+                    };
                   }
                 };
               }
@@ -695,9 +774,9 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadManyAndMakePublic([null, null], expectedBuffers).then(() => {
+        return store.uploadManyAndMakePublic([null, null], expectedBuffers).then(() => {
           //assert
-          expect(actualBuffers).to.equal(expectedBuffers);
+          expect(actualBuffers).to.eql(expectedBuffers);
         });
       });
     });
@@ -708,18 +787,29 @@ describe("tests", () => {
       it("should attempt to make a file public using the correct path given 1 file", () => {
         //arrange
         var expectedPaths = ["example/image/42.png"];
-        var actualPaths = [];
 
         var mockGoogleStorage = {
           "file": (path) => {
-            actualPaths.push(path);
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     //ignored
+                  }
+                };
+              }, "makePublic": () => {
+                return {
+                  "then": (callback) => {
+                    callback(path);
+                    return {
+                      "catch": () => {
+                        //ignored
+                      }
+                    };
                   }
                 };
               }
@@ -729,9 +819,9 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadManyAndMakePublic(expectedPaths, [null]).then(() => {
+        return store.uploadManyAndMakePublic(expectedPaths, [null]).then((actualPaths) => {
           //assert
-          expect(actualPaths).to.equal(expectedPaths);
+          expect(actualPaths).to.eql(expectedPaths);
         });
       });
     });
@@ -742,18 +832,29 @@ describe("tests", () => {
       it("should attempt to make files public using the correct paths given 2 files", () => {
         //arrange
         var expectedPaths = ["example/image/1.png", "example/image/2.png"];
-        var actualPaths = [];
 
         var mockGoogleStorage = {
           "file": (path) => {
-            actualPaths.push(path);
             return {
               "createWriteStream": () => {
                 return {
-                  "on": () => {
-                    //ignored
+                  "on": (event, callback) => {
+                    if (event == "finish") {
+                      callback();
+                    }
                   }, "end": () => {
                     //ignored
+                  }
+                };
+              }, "makePublic": () => {
+                return {
+                  "then": (callback) => {
+                    callback(path);
+                    return {
+                      "catch": () => {
+                        //ignored
+                      }
+                    };
                   }
                 };
               }
@@ -763,10 +864,12 @@ describe("tests", () => {
 
         //act
         var store = require("../../model/storage/store")(mockGoogleStorage);
-        store.uploadManyAndMakePublic(expectedPaths, [null, null]).then(() => {
-          //assert
-          expect(actualPaths).to.equal(expectedPaths);
-        });
+        return store.uploadManyAndMakePublic(expectedPaths, [null, null]).then((actualPaths) => {
+            //assert
+            expect(actualPaths.length).to.equal(2);
+            expect(actualPaths).to.include(expectedPaths[0]);
+            expect(actualPaths).to.include(expectedPaths[1]);
+          });
       });
     });
   });
