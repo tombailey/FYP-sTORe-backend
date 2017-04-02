@@ -64,11 +64,14 @@ function setupExpress(database) {
 		"keyFilename": "./fyp-store-backend-58a9b731e7dd.json"
 	});
 
-  var app = require("express")();
+	var express = require("express");
+  var app = express();
 	app.use(bodyParser.urlencoded({
 		//1mb limit
 		"limit": 1024 * 1024
 	}));
+
+	app.use(express.static("public"));
 
   setupEndpoints(app, upload, database.mongoose, database.entities,
 		storage.bucket(CONFIG.google.storage.bucketName));
