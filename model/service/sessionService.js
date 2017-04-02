@@ -5,7 +5,7 @@ const create = (mongoose, Session) => {
       Session.create({
         "developer": {
           "id": developerId
-        }, "validUntil": Date.now()
+        }
       }, (error, session) => {
         if (error) {
           reject(error);
@@ -22,7 +22,7 @@ const getSession = (mongoose, Session) => {
     return new Promise((resolve, reject) => {
       Session.findOne({
         "_id": sessionId
-      }, "developer.id", (error, session) => {
+      }, "developer.id validUntil", (error, session) => {
         if (error) {
           reject(error);
         } else if (session === undefined || session === null) {
@@ -36,7 +36,11 @@ const getSession = (mongoose, Session) => {
             "message": "session has expired"
           });
         } else {
-          resolve(session);
+          resolve({
+            "developer": {
+              "id": session.developer.id
+            }
+          });
         }
       });
     });
