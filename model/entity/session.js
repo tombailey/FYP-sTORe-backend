@@ -1,6 +1,8 @@
 /*jshint esversion: 6 */
 module.exports = (mongoose, uuidV4) => {
 
+  const MILLISECS_IN_HOUR = 60 * 60 * 1000;
+
   var sessionSchema = new mongoose.Schema({
     "_id": {
       "type": String,
@@ -8,7 +10,7 @@ module.exports = (mongoose, uuidV4) => {
     }, "validUntil": {
       "type": Date,
       "required": true,
-      "default": Date.now()
+      "default": new Date(Date.now() + MILLISECS_IN_HOUR)
     }, "developer": {
       "id": {
         "type": mongoose.Schema.Types.ObjectId,
