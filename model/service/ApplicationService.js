@@ -37,10 +37,8 @@ const incrementDownloadCount = (mongoose, Application) => {
         "$inc": {
           "downloadCount": 1
         }
-      }, (error, rowsAffected) => {
+      }, (error) => {
         if (error) {
-          reject(error);
-        } if (rowsAffected < 1) {
           reject(error);
         } else {
           resolve();
@@ -79,11 +77,9 @@ const update = (mongoose, Application) => {
             application.categories = attrsToUpdate.categories;
           }
 
-          application.save((error, updatedApplication, rowsAffected) => {
+          application.save((error, updatedApplication) => {
             if (error) {
               reject(error);
-            } else if (rowsAffected < 1) {
-              reject("update failed, no rows affect");
             } else {
               resolve(updatedApplication);
             }
@@ -112,11 +108,9 @@ const updateScreenshot = (mongoose, Application) => {
             //set required over traditional [index]=value so mongoose can detect
             //the update, see https://github.com/Automattic/mongoose/issues/1204
             application.screenshot.links.set(screenshotNumber, screenshotLink);
-            application.save((error, updatedApplication, rowsAffected) => {
+            application.save((error, updatedApplication) => {
               if (error) {
                 reject(error);
-              } else if (rowsAffected < 1) {
-                reject("update failed, no rows affect");
               } else {
                 resolve(updatedApplication);
               }
