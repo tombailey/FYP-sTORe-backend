@@ -2,6 +2,8 @@
 const DEFAULT_ATTRS = "_id name description downloadCount currentVersion " +
   "ratings screenshot categories";
 
+const APPS_PER_PAGE = 20;
+
 
 const create = (mongoose, Application) => {
   return (packageName, name, description, categories, developerId) => {
@@ -201,7 +203,6 @@ const getReviews = (mongoose, Application) => {
 
 const searchByCategory = (mongoose, Application) => {
   return (category, sortBy, sortDirection, page) => {
-    //TODO: use page
     var sort = {};
     sort[sortBy] = sortDirection;
     return findMany(mongoose, Application)({
@@ -209,14 +210,13 @@ const searchByCategory = (mongoose, Application) => {
       "currentVersion.number": {
         "$gte": 0
       },
-    }, DEFAULT_ATTRS, sort);
+    }, DEFAULT_ATTRS, sort, APPS_PER_PAGE, (page - 1) * APPS_PER_PAGE);
   };
 };
 
 const searchByKeywords = (mongoose, Application) => {
   return (keywords, page, attrs) => {
     return new Promise((resolve, reject) => {
-      //TODO: use page
       Application.find({
         "currentVersion.number": {
           "$gte": 0
@@ -226,7 +226,9 @@ const searchByKeywords = (mongoose, Application) => {
       }, DEFAULT_ATTRS, {
         "score": {
           "$meta": "textScore"
-        }
+        },
+        "limit": APPS_PER_PAGE,
+        "skip": (page - 1) * APPS_PER_PAGE
       }, (error, applications) => {
         if (error) {
           reject(error);
@@ -253,9 +255,11 @@ const findOne = (mongoose, Application) => {
 };
 
 const findMany = (mongoose, Application) => {
-  return (where, attrs, sort) => {
+  return (where, attrs, sort, limit, skip) => {
     return new Promise((resolve, reject) => {
       Application.find(where, attrs, {
+        "limit": limit,
+        "skip": skip,
         "sort": sort
       }, (error, applications) => {
         if (error) {
