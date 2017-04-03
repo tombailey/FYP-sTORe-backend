@@ -621,4 +621,82 @@ describe("tests", () => {
     });
   });
 
+  describe("applicationService", () => {
+    describe("#getReviews", () => {
+      it("should get reviews using correct application id", () => {
+        //arrange
+        var expectedId = 42;
+
+        var mockApplication = {
+          "findOne": (searchQuery, updateOperation, callback) => {
+            expect(searchQuery).to.deep.equal({
+              "_id": expectedId
+            });
+            callback(undefined, {"reviews": []});
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.getReviews(expectedId);
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("applicationService", () => {
+    describe("#getReviews", () => {
+      it("should subscribe for success when getting reviews", () => {
+        //arrange
+        var expectedReviews = [{
+          "date": Date.now(),
+          "message": "Amazing app",
+          "stars": 5
+        }];
+        var mockApplication = {
+          "findOne": (searchQuery, projection, callback) => {
+            callback(undefined, {"reviews": expectedReviews});
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.getReviews().then((actualReviews) => {
+          expect(actualReviews).to.deep.equal(expectedReviews);
+        });
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("applicationService", () => {
+    describe("#getReviews", () => {
+      it("should subscribe for errors when reviews", () => {
+        //arrange
+        var expectedError = 42;
+
+        var mockApplication = {
+          "findOne": (searchQuery, projection, callback) => {
+            callback(expectedError);
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.getReviews().then(() => {
+          throw "then was called";
+        }).catch((actualError) => {
+          expect(actualError).to.equal(expectedError);
+        });
+
+        //assert
+
+      });
+    });
+  });
+
 });
