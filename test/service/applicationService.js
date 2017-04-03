@@ -313,4 +313,110 @@ describe("tests", () => {
     });
   });
 
+  describe("applicationService", () => {
+    describe("#addVersion", () => {
+      it("should add version for application", () => {
+        //arrange
+        var expectedVersionNumber = 1;
+        var expectedVersionName = "1.0.0";
+        var expectedVersionBinaryLink = "https://example.com/app.apk";
+        var expectedUpdateOperation = {
+          "$push": {
+            "versions": {
+              "number": expectedVersionNumber,
+              "name": expectedVersionName,
+              "binaryLink": expectedVersionBinaryLink
+            }
+          }
+        };
+
+        var mockApplication = {
+          "findOneAndUpdate": (searchQuery, updateOperation, callback) => {
+            expect(updateOperation).to.deep.equal(expectedUpdateOperation);
+            callback();
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.addVersion(42, expectedVersionNumber,
+          expectedVersionName, expectedVersionBinaryLink);
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("applicationService", () => {
+    describe("#addVersion", () => {
+      it("should add version for correct application", () => {
+        //arrange
+        var expectedId = 42;
+
+        var mockApplication = {
+          "findOneAndUpdate": (searchQuery, updateOperation, callback) => {
+            expect(searchQuery).to.deep.equal({
+            "_id": expectedId
+            });
+            callback();
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.addVersion(expectedId);
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("applicationService", () => {
+    describe("#addVersion", () => {
+      it("should subscribe for success when adding a version", () => {
+        //arrange
+        var mockApplication = {
+          "findOneAndUpdate": (searchQuery, projection, callback) => {
+            callback();
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.addVersion();
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("applicationService", () => {
+    describe("#addVersion", () => {
+      it("should subscribe for errors when incrementing download count", () => {
+        //arrange
+        var expectedError = 42;
+
+        var mockApplication = {
+          "findOneAndUpdate": (searchQuery, projection, callback) => {
+            callback(expectedError);
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.addVersion().then(() => {
+          throw "then was called";
+        }).catch((actualError) => {
+          expect(actualError).to.equal(expectedError);
+        });
+
+        //assert
+
+      });
+    });
+  });
+
 });
