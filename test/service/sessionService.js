@@ -95,7 +95,11 @@ describe("tests", () => {
             expect(searchQuery).to.deep.equal({
               "_id": expectedId
             });
-            callback(undefined, {});
+            callback(undefined, {
+              "developer": {
+                "id": 1
+              }
+            });
           }
         };
 
@@ -116,8 +120,12 @@ describe("tests", () => {
         //arrange
         var mockSession = {
           "findOne": (searchQuery, projection, callback) => {
-            expect(projection).to.equal("developer.id");
-            callback(undefined, {});
+            expect(projection).to.equal("developer.id validUntil");
+            callback(undefined, {
+              "developer": {
+                "id": 1
+              }
+            });
           }
         };
 
@@ -132,6 +140,63 @@ describe("tests", () => {
     });
   });
 
+  describe("sessionService", () => {
+    describe("#getSession", () => {
+      it("should cause error when session does not exist", () => {
+        //arrange
+        var mockSession = {
+          "findOne": (searchQuery, projection, callback) => {
+            callback();
+          }
+        };
+
+        //act
+        var sessionService = require("../../model/service/sessionService")
+          (null, mockSession);
+        return sessionService.getSession(42).then(() => {
+          throw "not expected error";
+        }).catch((error) => {
+          expect(error).to.deep.equal({
+            "code": 401,
+            "message": "session does not exist"
+          });
+        });
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("sessionService", () => {
+    describe("#getSession", () => {
+      it("should cause error when session is no longer valid", () => {
+        //arrange
+        var mockSession = {
+          "findOne": (searchQuery, projection, callback) => {
+            callback(undefined, {
+              "validUntil": 0
+            });
+          }
+        };
+
+        //act
+        var sessionService = require("../../model/service/sessionService")
+          (null, mockSession);
+        return sessionService.getSession(42).then(() => {
+          throw "not expected error";
+        }).catch((error) => {
+          expect(error).to.deep.equal({
+            "code": 401,
+            "message": "session has expired"
+          });
+        });
+
+        //assert
+
+      });
+    });
+  });
 
   describe("sessionService", () => {
     describe("#getSession", () => {
