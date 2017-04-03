@@ -41,7 +41,6 @@ const findOne = (mongoose, Developer) => {
 module.exports = (mongoose, Developer) => {
   return {
     "create": create(mongoose, Developer),
-    "getById": getById(mongoose, Developer),
     "getByName": getByName(mongoose, Developer)
   };
 };
