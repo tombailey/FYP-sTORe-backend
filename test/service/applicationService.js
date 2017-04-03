@@ -548,4 +548,77 @@ describe("tests", () => {
     });
   });
 
+  describe("applicationService", () => {
+    describe("#getApplicationByIdAndDeveloperId", () => {
+      it("should get application using correct application id and developer id", () => {
+        //arrange
+        var expectedSearchQuery = {
+          "_id": 1,
+          "developer.id": 2
+        };
+
+        var mockApplication = {
+          "findOne": (searchQuery, updateOperation, callback) => {
+            expect(searchQuery).to.deep.equal(expectedSearchQuery);
+            callback();
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.getApplicationByIdAndDeveloperId(expectedSearchQuery._id,
+          expectedSearchQuery["developer.id"]);
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("applicationService", () => {
+    describe("#createReview", () => {
+      it("should subscribe for success when getting an application by a developer", () => {
+        //arrange
+        var mockApplication = {
+          "findOne": (searchQuery, projection, callback) => {
+            callback();
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.getApplicationByIdAndDeveloperId();
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("applicationService", () => {
+    describe("#createReview", () => {
+      it("should subscribe for errors when getting an application by a developer", () => {
+        //arrange
+        var expectedError = 42;
+
+        var mockApplication = {
+          "findOne": (searchQuery, projection, callback) => {
+            callback(expectedError);
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.getApplicationByIdAndDeveloperId().then(() => {
+          throw "then was called";
+        }).catch((actualError) => {
+          expect(actualError).to.equal(expectedError);
+        });
+
+        //assert
+
+      });
+    });
+  });
+
 });
