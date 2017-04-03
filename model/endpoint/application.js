@@ -15,8 +15,9 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
   const sessionService =
     require("../service/sessionService")(mongoose, entities.Session);
 
+  const https = require("https");
   const cacheHeaderOverriddenRequest =
-    require("../request/cacheHeaderOverriddenRequest");
+    require("../request/cacheHeaderOverriddenRequest")(https);
 
   const VALID_SORT_BYS = {
     "downloadcount": "downloadCount",
