@@ -16,14 +16,6 @@ const create = (mongoose, Developer) => {
   };
 };
 
-const getById = (mongoose, Developer) => {
-  return (developerId, attrs) => {
-    return findOne(mongoose, Developer)({
-      "id": developerId,
-    }, attrs);
-  };
-};
-
 const getByName = (mongoose, Developer) => {
   return (name, attrs) => {
     return findOne(mongoose, Developer)({
