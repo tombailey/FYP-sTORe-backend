@@ -2,26 +2,24 @@
 describe("tests", () => {
   const expect = require("chai").expect;
 
-  const error = require("../../model/response/error");
-
-  describe("error", () => {
-    describe("#badRequest", () => {
-      it("should produce 400 error code", () => {
+  describe("developerService", () => {
+    describe("#create", () => {
+      it("should create developer with correct attributes", () => {
         //arrange
-        var mockResponse = {
-          "json": () => {
-
-          },
-          "status": (code) => {
-            expect(code).to.equal(400);
-            return mockResponse;
+        var expectedDeveloper = {
+          "name": "arthurdent",
+          "password": "thanksforallthefish"
+        };
+        var mockDeveloper = {
+          "create": (attrs, callback) => {
+            expect(attrs).to.deep.equal(expectedDeveloper);
+            callback(undefined, {});
           }
         };
-        var message = "bad request";
-
 
         //act
-        error.badRequest(mockResponse, message);
+        var developerService = require("../../model/service/developerService")(null, mockDeveloper);
+        return developerService.create(expectedDeveloper.name, expectedDeveloper.password);
 
 
         //assert
@@ -30,29 +28,79 @@ describe("tests", () => {
     });
   });
 
-  describe("error", () => {
-    describe("#badRequest", () => {
-      it("should produce correct error json", () => {
+  describe("developerService", () => {
+    describe("#create", () => {
+      it("should subscribe for success when creating a developer", () => {
         //arrange
-        var message = "bad request";
+        var expectedDeveloper = {
+          "name": "arthurdent",
+          "password": "thanksforallthefish"
+        };
+        var mockDeveloper = {
+          "create": (attrs, callback) => {
+            expect(attrs).to.deep.equal(expectedDeveloper);
+            callback(undefined, expectedDeveloper);
+          }
+        };
 
-        var mockResponse = {
-          "json": (data) => {
-            expect(data).to.deep.equal({
-              "errors": [{
-                "code": 400,
-                "message": message
-              }]
+        //act
+        var developerService = require("../../model/service/developerService")(null, mockDeveloper);
+        return developerService.create(expectedDeveloper.name, expectedDeveloper.password).then((developer) => {
+          expect(developer).to.deep.equal(expectedDeveloper);
+        });
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("developerService", () => {
+    describe("#create", () => {
+      it("should subscribe for errors when creating a developer", () => {
+        //arrange
+        var expectedError = 42;
+
+        var mockDeveloper = {
+          "create": (attrs, callback) => {
+            callback(expectedError);
+          }
+        };
+
+        //act
+        var developerService = require("../../model/service/developerService")
+          (null, mockDeveloper);
+        return developerService.create("arthurdent", "thanksforallthefish").then(() => {
+          throw "";
+        }).catch((actualError) => {
+          expect(actualError).to.equal(expectedError);
+        });
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("developerService", () => {
+    describe("#getByName", () => {
+      it("should get developer with correct name", () => {
+        //arrange
+        var expectedName = "arthurdent";
+
+        var mockDeveloper = {
+          "findOne": (searchQuery, projection, callback) => {
+            expect(searchQuery).to.deep.equal({
+              "name": expectedName
             });
-          },
-          "status": (code) => {
-            return mockResponse;
+            callback();
           }
         };
 
         //act
-        error.badRequest(mockResponse, message);
-
+        var developerService = require("../../model/service/developerService")
+          (null, mockDeveloper);
+        return developerService.getByName("arthurdent", "thanksforallthefish");
 
         //assert
 
@@ -60,55 +108,26 @@ describe("tests", () => {
     });
   });
 
-  describe("error", () => {
-    describe("#notFound", () => {
-      it("should produce 404 error code", () => {
+  describe("developerService", () => {
+    describe("#getByName", () => {
+      it("should make name lowercase when getting a developer", () => {
         //arrange
-        var mockResponse = {
-          "json": () => {
+        var name = "ArthurDent";
+        var expectedName = "arthurdent";
 
-          },
-          "status": (code) => {
-            expect(code).to.equal(404);
-            return mockResponse;
-          }
-        };
-        var message = "not found";
-
-
-        //act
-        error.notFound(mockResponse, message);
-
-
-        //assert
-
-      });
-    });
-  });
-
-  describe("error", () => {
-    describe("#notFound", () => {
-      it("should produce correct error json", () => {
-        //arrange
-        var message = "not found";
-
-        var mockResponse = {
-          "json": (data) => {
-            expect(data).to.deep.equal({
-              "errors": [{
-                "code": 404,
-                "message": message
-              }]
+        var mockDeveloper = {
+          "findOne": (searchQuery, projection, callback) => {
+            expect(searchQuery).to.deep.equal({
+              "name": expectedName
             });
-          },
-          "status": (code) => {
-            return mockResponse;
+            callback();
           }
         };
 
         //act
-        error.notFound(mockResponse, message);
-
+        var developerService = require("../../model/service/developerService")
+          (null, mockDeveloper);
+        return developerService.getByName(name, "thanksforallthefish");
 
         //assert
 
@@ -116,25 +135,28 @@ describe("tests", () => {
     });
   });
 
-  describe("error", () => {
-    describe("#internalServerError", () => {
-      it("should produce 500 error code", () => {
+  describe("developerService", () => {
+    describe("#getByName", () => {
+      it("sshould subscribe for success when getting a developer", () => {
         //arrange
-        var mockResponse = {
-          "json": () => {
+        var expectedDeveloper = {
+          "id": 42,
+          "name": "arthurdent",
+          "password": "thanksforallthefish"
+        };
 
-          },
-          "status": (code) => {
-            expect(code).to.equal(500);
-            return mockResponse;
+        var mockDeveloper = {
+          "findOne": (searchQuery, projection, callback) => {
+            callback(undefined, expectedDeveloper);
           }
         };
-        var message = "internal server error";
-
 
         //act
-        error.internalServerError(mockResponse, message);
-
+        var developerService = require("../../model/service/developerService")
+          (null, mockDeveloper);
+        return developerService.getByName(expectedDeveloper.name, expectedDeveloper.password).then((actualDeveloper) => {
+          expect(actualDeveloper).to.deep.equal(expectedDeveloper);
+        });
 
         //assert
 
@@ -142,29 +164,26 @@ describe("tests", () => {
     });
   });
 
-  describe("error", () => {
-    describe("#internalServerError", () => {
-      it("should produce correct error json", () => {
+  describe("developerService", () => {
+    describe("#getByName", () => {
+      it("should subscribe for errors when getting a developer", () => {
         //arrange
-        var message = "internal server error";
+        var expectedError = 42;
 
-        var mockResponse = {
-          "json": (data) => {
-            expect(data).to.deep.equal({
-              "errors": [{
-                "code": 500,
-                "message": message
-              }]
-            });
-          },
-          "status": (code) => {
-            return mockResponse;
+        var mockDeveloper = {
+          "findOne": (searchQuery, projection, callback) => {
+            callback(expectedError);
           }
         };
 
         //act
-        error.internalServerError(mockResponse, message);
-
+        var developerService = require("../../model/service/developerService")
+          (null, mockDeveloper);
+        return developerService.getByName("arthurdent", "thanksforallthefish").then(() => {
+          throw "";
+        }).catch((actualError) => {
+          expect(actualError).to.equal(expectedError);
+        });
 
         //assert
 
