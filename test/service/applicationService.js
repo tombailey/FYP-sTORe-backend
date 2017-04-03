@@ -2,26 +2,71 @@
 describe("tests", () => {
   const expect = require("chai").expect;
 
-  const error = require("../../model/response/error");
+  describe("applicationService", () => {
+    describe("#create", () => {
+      it("should create application with correct attributes", () => {
+        //arrange
+        var expectedApplication = {
+          "_id": "com.example",
+          "name": "example",
+          "description": "this is an example application",
+          "featureGraphicLink": null,
+          "iconLink": null,
+          "screenshots": [],
+          "reviews": [],
+          "versions": [],
+          "categories": ["communication"],
+          "developer.id": 42
+        };
+        var mockApplication = {
+          "create": (attrs, callback) => {
+            expect(attrs).to.deep.equal(expectedApplication);
+            callback(undefined, {});
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.create(expectedApplication._id,
+          expectedApplication.name, expectedApplication.description,
+          expectedApplication.categories, expectedApplication["developer.id"]).then(() => {
+
+        });
+
+
+        //assert
+
+      });
+    });
+  });
 
   describe("applicationService", () => {
-    describe("#badRequest", () => {
-      it("should produce 400 error code", () => {
+    describe("#create", () => {
+      it("should subscribe for success when creating an application", () => {
         //arrange
-        var mockResponse = {
-          "json": () => {
-
-          },
-          "status": (code) => {
-            expect(code).to.equal(400);
-            return mockResponse;
+        var expectedApplication = {
+          "_id": "com.example",
+          "name": "example",
+          "description": "this is an example application",
+          "featureGraphicLink": null,
+          "iconLink": null,
+          "screenshots": [],
+          "reviews": [],
+          "versions": [],
+          "categories": ["communication"],
+          "developer.id": 42
+        };
+        var mockApplication = {
+          "create": (attrs, callback) => {
+            callback(undefined, expectedApplication);
           }
         };
-        var message = "bad request";
-
 
         //act
-        error.badRequest(mockResponse, message);
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.create().then((actualApplication) => {
+          expect(actualApplication).to.deep.equal(expectedApplication);
+        });
 
 
         //assert
@@ -30,28 +75,52 @@ describe("tests", () => {
     });
   });
 
-  describe("error", () => {
-    describe("#badRequest", () => {
-      it("should produce correct error json", () => {
+  describe("applicationService", () => {
+    describe("#create", () => {
+      it("should subscribe for errors when creating an application", () => {
         //arrange
-        var message = "bad request";
+        var expectedError =  42;
+        var mockApplication = {
+          "create": (attrs, callback) => {
+            callback(expectedError);
+          }
+        };
 
-        var mockResponse = {
-          "json": (data) => {
-            expect(data).to.deep.equal({
-              "errors": [{
-                "code": 400,
-                "message": message
-              }]
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.create().then(() => {
+            throw "then was called";
+        }).catch((actualError) => {
+          expect(actualError).to.deep.equal(expectedError);
+        });
+
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("applicationService", () => {
+    describe("#getApplication", () => {
+      it("should get application using correct id", () => {
+        //arrange
+        var expectedId = 42;
+
+        var mockApplication = {
+          "findOne": (searchQuery, projection, callback) => {
+            expect(searchQuery).to.deep.equal({
+              "_id": expectedId
             });
-          },
-          "status": (code) => {
-            return mockResponse;
+            callback(undefined, {});
           }
         };
 
         //act
-        error.badRequest(mockResponse, message);
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.getApplication(expectedId).then(() => {
+
+        });
 
 
         //assert
@@ -60,25 +129,24 @@ describe("tests", () => {
     });
   });
 
-  describe("error", () => {
-    describe("#notFound", () => {
-      it("should produce 404 error code", () => {
+  describe("applicationService", () => {
+    describe("#getApplication", () => {
+      it("should get application with correct attributes", () => {
         //arrange
-        var mockResponse = {
-          "json": () => {
+        var expectedProjection = "_id name";
 
-          },
-          "status": (code) => {
-            expect(code).to.equal(404);
-            return mockResponse;
+        var mockApplication = {
+          "findOne": (searchQuery, projection, callback) => {
+            expect(projection).to.equal(expectedProjection);
+            callback(undefined, {});
           }
         };
-        var message = "not found";
-
 
         //act
-        error.notFound(mockResponse, message);
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.getApplication(42, expectedProjection).then(() => {
 
+        });
 
         //assert
 
@@ -86,29 +154,112 @@ describe("tests", () => {
     });
   });
 
-  describe("error", () => {
-    describe("#notFound", () => {
-      it("should produce correct error json", () => {
-        //arrange
-        var message = "not found";
 
-        var mockResponse = {
-          "json": (data) => {
-            expect(data).to.deep.equal({
-              "errors": [{
-                "code": 404,
-                "message": message
-              }]
+  describe("applicationService", () => {
+    describe("#getApplication", () => {
+      it("should subscribe for success when getting an application", () => {
+        //arrange
+        var expectedApplication = {
+          "_id": "com.example",
+          "name": "example",
+          "description": "this is an example application",
+          "featureGraphicLink": null,
+          "iconLink": null,
+          "screenshots": [],
+          "reviews": [],
+          "versions": [],
+          "categories": ["communication"],
+          "developer.id": 42
+        };
+
+        var mockApplication = {
+          "findOne": (searchQuery, projection, callback) => {
+            callback(undefined, expectedApplication);
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.getApplication(42).then((actualApplication) => {
+          expect(actualApplication).to.deep.equal(expectedApplication);
+        });
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("applicationService", () => {
+    describe("#getApplication", () => {
+      it("should subscribe for success when getting an application", () => {
+        //arrange
+        var expectedError = 42;
+
+        var mockApplication = {
+          "findOne": (searchQuery, projection, callback) => {
+            callback(expectedError);
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.getApplication(42).then((actualApplication) => {
+          throw "then was called";
+        }).catch((actualError) => {
+          expect(actualError).to.equal(expectedError);
+        });
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("applicationService", () => {
+    describe("#incrementDownloadCount", () => {
+      it("should increment download count", () => {
+        //arrange
+        var expectedUpdateOperation = {
+          "$inc": {
+            "downloadCount": 1
+          }
+        };
+
+        var mockApplication = {
+          "update": (searchQuery, updateOperation, callback) => {
+            expect(updateOperation).to.deep.equal(expectedUpdateOperation);
+            callback();
+          }
+        };
+
+        //act
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.incrementDownloadCount(42);
+
+        //assert
+
+      });
+    });
+  });
+
+  describe("applicationService", () => {
+    describe("#incrementDownloadCount", () => {
+      it("should increment download count for correct application", () => {
+        //arrange
+        var expectedId = 42;
+        var mockApplication = {
+          "update": (searchQuery, updateOperation, callback) => {
+            expect(searchQuery).to.deep.equal({
+              "_id": expectedId
             });
-          },
-          "status": (code) => {
-            return mockResponse;
+            callback();
           }
         };
 
         //act
-        error.notFound(mockResponse, message);
-
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.incrementDownloadCount(expectedId);
 
         //assert
 
@@ -116,25 +267,19 @@ describe("tests", () => {
     });
   });
 
-  describe("error", () => {
-    describe("#internalServerError", () => {
-      it("should produce 500 error code", () => {
+  describe("applicationService", () => {
+    describe("#incrementDownloadCount", () => {
+      it("should subscribe for success when incrementing download count", () => {
         //arrange
-        var mockResponse = {
-          "json": () => {
-
-          },
-          "status": (code) => {
-            expect(code).to.equal(500);
-            return mockResponse;
+        var mockApplication = {
+          "update": (searchQuery, projection, callback) => {
+            callback();
           }
         };
-        var message = "internal server error";
-
 
         //act
-        error.internalServerError(mockResponse, message);
-
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.incrementDownloadCount();
 
         //assert
 
@@ -142,29 +287,25 @@ describe("tests", () => {
     });
   });
 
-  describe("error", () => {
-    describe("#internalServerError", () => {
-      it("should produce correct error json", () => {
+  describe("applicationService", () => {
+    describe("#incrementDownloadCount", () => {
+      it("should subscribe for errors when incrementing download count", () => {
         //arrange
-        var message = "internal server error";
+        var expectedError = 42;
 
-        var mockResponse = {
-          "json": (data) => {
-            expect(data).to.deep.equal({
-              "errors": [{
-                "code": 500,
-                "message": message
-              }]
-            });
-          },
-          "status": (code) => {
-            return mockResponse;
+        var mockApplication = {
+          "update": (searchQuery, projection, callback) => {
+            callback(expectedError);
           }
         };
 
         //act
-        error.internalServerError(mockResponse, message);
-
+        var applicationService = require("../../model/service/applicationService")(null, mockApplication);
+        return applicationService.incrementDownloadCount().then((actualApplication) => {
+          throw "then was called";
+        }).catch((actualError) => {
+          expect(actualError).to.equal(expectedError);
+        });
 
         //assert
 
