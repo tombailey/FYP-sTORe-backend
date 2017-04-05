@@ -182,6 +182,17 @@ const getApplication = (mongoose, Application) => {
   };
 };
 
+const getApplicationsByDeveloperId = (mongoose, Application) => {
+  return (developerId, attrs) => {
+    return findMany(mongoose, Application)({
+      "developer.id": developerId,
+      "currentVersion.number": {
+        "$gte": 0
+      }
+    }, attrs);
+  };
+};
+
 const getApplicationByIdAndDeveloperId = (mongoose, Application) => {
   return (applicationId, developerId, attrs) => {
     return findOne(mongoose, Application)({
@@ -278,6 +289,7 @@ module.exports = (mongoose, Application) => {
     "createReview": createReview(mongoose, Application),
     "addVersion": addVersion(mongoose, Application),
     "getApplication": getApplication(mongoose, Application),
+    "getApplicationsByDeveloperId": getApplicationsByDeveloperId(mongoose, Application),
     "getApplicationByIdAndDeveloperId": getApplicationByIdAndDeveloperId(mongoose, Application),
     "getReviews": getReviews(mongoose, Application),
     "incrementDownloadCount": incrementDownloadCount(mongoose, Application),

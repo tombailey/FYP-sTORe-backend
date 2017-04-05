@@ -65,6 +65,15 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
     });
   };
 
+  const searchByDeveloper = (req, res, developerId, page) => {
+    applicationService.getApplicationsByDeveloperId(developerId).then((applications) => {
+      success.ok(res, applications, cache.private().hours(1));
+    }).catch((err) => {
+      console.error(err);
+      error.internalServerError(res, "database issue");
+    });
+  };
+
   app.get("/api/applications", (req, res) => {
     var page = req.query.page;
     if (page === undefined) {
@@ -77,10 +86,25 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
 
     var category = req.query.category;
     var keywords = req.query.keywords;
+    var developerId = req.query.developerId;
+    var sessionId = req.query.sessionId;
     if (category !== undefined) {
       searchByCategory(req, res, category.toLowerCase(), page);
     } else if (keywords !== undefined) {
       searchByKeywords(req, res, keywords, page);
+    } else if (developerId !== undefined) {
+      searchByDeveloper(req, res, developerId, page);
+    } else if (sessionId !== undefined) {
+      sessionService.getSession(sessionId).then((session) => {
+        searchByDeveloper(req, res, session.developer.id, page);
+      }).catch((err) => {
+        console.error(err);
+        if (err.code && err.message) {
+          error.error(res, err);
+        } else {
+          error.internalServerError(res, "internal server error");
+        }
+      });
     } else {
       error.badRequest(res, "category or keywords is required");
       return;
@@ -126,7 +150,6 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
     }
 
     sessionService.getSession(sessionId).then((session) => {
-      //TODO: check for duplicate package name
       return applicationService.create(packageName, name, description,
         [category], session.developer.id);
     }).then((newApplication) => {
