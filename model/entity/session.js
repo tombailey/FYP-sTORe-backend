@@ -5,8 +5,7 @@ module.exports = (mongoose, uuidV4) => {
 
   var sessionSchema = new mongoose.Schema({
     "_id": {
-      "type": String,
-      "default": uuidV4()
+      "type": String
     }, "validUntil": {
       "type": Date,
       "required": true,
@@ -17,6 +16,11 @@ module.exports = (mongoose, uuidV4) => {
         "required": true
       }
     }
+  });
+
+  sessionSchema.pre("save", function(next) {
+    this._id = uuidV4();
+    next();
   });
 
   sessionSchema.index({
