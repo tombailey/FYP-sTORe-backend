@@ -4,3 +4,10 @@ body {
   margin: 0 auto;
   max-width: 800px;
 }
+
+.app {
+  background-color: #EEEEEE;
+  margin: 20px;
+  padding: 10px;
+  width: 300px;
+}

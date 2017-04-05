@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="scripts/request.js"></script>
+    <script type="text/javascript">
+      window.loadApps = function() {
+        var sessionId = getCookie("sessionId");
+
+        //TODO: support pages
+        new request("/api/applications/?sessionId=" + sessionId + "&page=1")
+          .get()
+          .then(function(error, status, responseText) {
+            if (error || status !== 200) {
+              alert(JSON.parse(responseText).errors[0].message);
+            } else {
+              showApps(JSON.parse(responseText).data)
+            }
+          });
+      }
+
+      function getCookie(name) {
+        var cookieValueStarts = document.cookie.indexOf(name + "=") + name.length + 1;
+        var cookieValueEnds = document.cookie.substring(cookieValueStarts).indexOf(";");
+
+        if (cookieValueStarts > -1) {
+          if (cookieValueEnds > -1) {
+            return document.cookie.substring(cookieValueStarts, cookieValueEnds);
+          } else {
+            return document.cookie.substring(cookieValueStarts);
+          }
+        } else {
+          return null;
+        }
+      }
+
+      function showApps(apps) {
+        var appsHtml = "";
+        apps.forEach(function(app) {
+          appsHtml += getAppHtml(app);
+        });
+        document.getElementById("apps").innerHTML = appsHtml;
+      }
+
+      function getAppHtml(app) {
+        return "<div class='app'>" +
+          "<img width='300px' src='/api/applications/" + app._id + "/featureGraphic'/>" +
+          "<a href='app.html?id=" + app._id + "'>" +
+          "<h2>" + app.name + "</h2>" +
+          "</a>" +
+          "</div>";
+      }
+    </script>
+    <title>sTORe</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+  </head>
+  <body onload="loadApps()">
+    <noscript>
+      <p>Please enable JavaScript for this page to work correctly.</p>
+    </noscript>
+    <h1>Your apps:</h1>
+    <div id="apps">
+
+    </div>
+    <br /><br />
+  </body>
+</html>
