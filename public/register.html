@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="scripts/request.js"></script>
+    <script type="text/javascript">
+      window.registerDeveloper = function() {
+        var name = document.getElementById("name").value;
+        var password = document.getElementById("password").value;
+
+        new request("/api/developers").post([{
+          "name": "name",
+          "value": name
+        }, {
+          "name": "password",
+          "value": password
+        }]).then(function(error, status, responseText) {
+          if (error || status !== 201) {
+            alert(JSON.parse(responseText).errors[0].message);
+          } else {
+            alert("Your account has been created");
+            window.location = "login.html";
+          }
+        });
+      }
+    </script>
+    <title>sTORe</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+  </head>
+  <body>
+    <noscript>
+      <p>Please enable JavaScript for this page to work correctly.</p>
+    </noscript>
+    <h1>Become a developer</h1>
+    <form>
+      <p>Name: <input id="name" min="4" max="32" required="true" type="text"/></p>
+      <p>Password: <input id="password" min="8" max="32" required="true" type="password"/></p>
+      <input onclick="registerDeveloper()" type="button" value="Register"/></p>
+    </form>
+    <br /><br />
+  </body>
+</html>
