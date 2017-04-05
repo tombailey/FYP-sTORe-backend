@@ -17,7 +17,7 @@ module.exports = (app, mongoose, entities) => {
       error.badRequest(res, "name is required");
       return;
     } else if (name.length <= 4 && name.length >= 32) {
-      error.badRequest(res, "name length is invalid. Needs to be <= 8 and >= 32");
+      error.badRequest(res, "name length is invalid. Needs to be <= 4 and >= 32");
       return;
     }
 
