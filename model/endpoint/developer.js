@@ -16,7 +16,7 @@ module.exports = (app, mongoose, entities) => {
     if (name === undefined) {
       error.badRequest(res, "name is required");
       return;
-    } else if (name.length <= 4 && name.length >= 32) {
+    } else if (name.length < 4 || name.length > 32) {
       error.badRequest(res, "name length is invalid. Needs to be <= 4 and >= 32");
       return;
     }
@@ -25,12 +25,11 @@ module.exports = (app, mongoose, entities) => {
     if (password === undefined) {
       error.badRequest(res, "password is required");
       return;
-    } else if (password.length <= 8 && password.length >= 32) {
+    } else if (password.length < 8 || password.length > 32) {
       //required as bcrypt has a password length limit
       error.badRequest(res, "password length is invalid. Needs to be <= 8 and >= 32");
       return;
     }
-
 
     bcrypt.hash(password, 16).then((hash) => {
       return developerService.create(name, hash);
