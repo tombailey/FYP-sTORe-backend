@@ -1,6 +1,6 @@
 /*jshint esversion: 6 */
 const DEFAULT_ATTRS = "_id name description downloadCount currentVersion " +
-  "ratings screenshot categories";
+  "ratings screenshotCount categories";
 
 const APPS_PER_PAGE = 20;
 
