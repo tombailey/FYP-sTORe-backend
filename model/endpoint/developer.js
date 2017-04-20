@@ -35,8 +35,7 @@ module.exports = (app, mongoose, entities) => {
       return developerService.create(name, hash);
     }).then((developer) => {
       success.created(res, {
-        "registered": true,
-        "id": developer.id
+        "registered": true
       });
     }).catch((err) => {
       console.error(err);
