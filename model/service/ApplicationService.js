@@ -207,7 +207,14 @@ const getReviews = (mongoose, Application) => {
     return findOne(mongoose, Application)({
       "_id": applicationId
     }).then((application) => {
-      return Promise.resolve(application.reviews);
+      if (application === null) {
+        return Promise.reject({
+          "code": 404,
+          "message": "Application not found"
+        });
+      } else {
+        return Promise.resolve(application.reviews);
+      }
     });
   };
 };
