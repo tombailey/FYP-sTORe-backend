@@ -64,7 +64,7 @@ const update = (mongoose, Application) => {
           }
 
           if (attrsToUpdate.description) {
-            application.name = attrsToUpdate.description;
+            application.description = attrsToUpdate.description;
           }
 
           if (attrsToUpdate.featureGraphicLink) {
