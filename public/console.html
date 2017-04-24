@@ -10,7 +10,9 @@
         new request("/api/applications/?sessionId=" + sessionId + "&page=1")
           .get()
           .then(function(error, status, responseText) {
-            if (error || status !== 200) {
+            if (status == 401) {
+              window.location = "login.html";
+            } else if (error || status !== 200) {
               alert(JSON.parse(responseText).errors[0].message);
             } else {
               showApps(JSON.parse(responseText).data)
@@ -35,9 +37,14 @@
 
       function showApps(apps) {
         var appsHtml = "";
-        apps.forEach(function(app) {
-          appsHtml += getAppHtml(app);
-        });
+
+        if (apps.length == 0) {
+          appHtmls = "<p>No apps found.</p>";
+        } else {
+          apps.forEach(function(app) {
+            appsHtml += getAppHtml(app);
+          });
+        }
         document.getElementById("apps").innerHTML = appsHtml;
       }
 
@@ -57,9 +64,14 @@
     <noscript>
       <p>Please enable JavaScript for this page to work correctly.</p>
     </noscript>
-    <h1>Your apps:</h1>
+    <div class="margin-top-10px">
+      <h1 class="inline-block">Your applications:</h1>
+      <a class="float-right" href="create.html">
+        <img src="images/create.png"/>
+      </a>
+    </div>
     <div id="apps">
-
+      
     </div>
     <br /><br />
   </body>
