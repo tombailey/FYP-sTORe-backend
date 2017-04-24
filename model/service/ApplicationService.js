@@ -185,10 +185,7 @@ const getApplication = (mongoose, Application) => {
 const getApplicationsByDeveloperId = (mongoose, Application) => {
   return (developerId, attrs) => {
     return findMany(mongoose, Application)({
-      "developer.id": developerId,
-      "currentVersion.number": {
-        "$gte": 0
-      }
+      "developer.id": developerId
     }, attrs);
   };
 };
