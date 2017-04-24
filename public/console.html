@@ -39,12 +39,13 @@
         var appsHtml = "";
 
         if (apps.length == 0) {
-          appHtmls = "<p>No apps found.</p>";
+          appsHtml = "<p>No apps found.</p>";
         } else {
           apps.forEach(function(app) {
             appsHtml += getAppHtml(app);
           });
         }
+
         document.getElementById("apps").innerHTML = appsHtml;
       }
 
@@ -71,7 +72,7 @@
       </a>
     </div>
     <div id="apps">
-      
+
     </div>
     <br /><br />
   </body>
