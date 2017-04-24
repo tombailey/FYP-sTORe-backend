@@ -8,8 +8,7 @@ module.exports = (mongoose, uuidV4) => {
       "type": String
     }, "validUntil": {
       "type": Date,
-      "required": true,
-      "default": new Date(Date.now() + MILLISECS_IN_HOUR)
+      "required": true
     }, "developer": {
       "id": {
         "type": mongoose.Schema.Types.ObjectId,
@@ -20,6 +19,7 @@ module.exports = (mongoose, uuidV4) => {
 
   sessionSchema.pre("save", function(next) {
     this._id = uuidV4();
+    this.validUntil = new Date(Date.now() + MILLISECS_IN_HOUR);
     next();
   });
 
