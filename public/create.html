@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="scripts/request.js"></script>
+    <script type="text/javascript">
+      window.createApplication = function() {
+        var sessionId = getCookie("sessionId");
+
+        var packageName = document.getElementById("packageName").value;
+        var name = document.getElementById("name").value;
+        var description = document.getElementById("description").value;
+        var category = document.getElementById("category").value;
+
+        new request("/api/applications").post([{
+          "name": "sessionId",
+          "value": sessionId
+        }, {
+          "name": "packageName",
+          "value": packageName
+        }, {
+          "name": "name",
+          "value": name
+        }, {
+          "name": "description",
+          "value": description
+        }, {
+          "name": "category",
+          "value": category
+        }]).then(function(error, status, responseText) {
+          if (status == 401) {
+            window.location = "login.html";
+          } else if (error || status !== 201) {
+            alert(JSON.parse(responseText).errors[0].message);
+          } else {
+            alert("Your application has been created");
+            window.location = "console.html";
+          }
+        });
+      }
+
+      function getCookie(name) {
+        var cookieValueStarts = document.cookie.indexOf(name + "=") + name.length + 1;
+        var cookieValueEnds = document.cookie.substring(cookieValueStarts).indexOf(";");
+
+        if (cookieValueStarts > -1) {
+          if (cookieValueEnds > -1) {
+            return document.cookie.substring(cookieValueStarts, cookieValueEnds);
+          } else {
+            return document.cookie.substring(cookieValueStarts);
+          }
+        } else {
+          return null;
+        }
+      }
+    </script>
+    <title>sTORe</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+  </head>
+  <body>
+    <noscript>
+      <p>Please enable JavaScript for this page to work correctly.</p>
+    </noscript>
+    <h1 class="margin-top-10px">Create an application:</h1>
+    <form>
+      <p>Package name: <input id="packageName" required="true" type="text"/></p>
+      <p>Name: <input id="name" min="4" max="64" required="true" type="text"/></p>
+      <p>Description: <textarea id="description" min="64" max="1024" rows="3" required="true"/></textarea></p>
+      <p>Category: <select id="category" required="true">
+        <option value="communcation">Communication</option>
+        <option value="entertainment">Entertainment</option>
+        <option value="shopping">Shopping</option>
+        <option value="utilities">Utilities</option>
+      </select></p>
+      <input onclick="createApplication()" type="button" value="Create"/></p>
+    </form>
+    <br /><br />
+  </body>
+</html>
