@@ -23,29 +23,32 @@ window.request = function(url) {
     };
   };
 
-  var post = function(params) {
-    var xHttp = new XMLHttpRequest();
-    xHttp.open("POST", url, true);
-    xHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  var body = function(method) {
+    return function(params) {
+      var xHttp = new XMLHttpRequest();
+      xHttp.open(method, url, true);
+      xHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    var body = "";
-    params.forEach(function(param, index) {
-      body += param.name + "=" + param.value;
-      if (index != params.length - 1) {
-        body += "&";
-      }
-    });
-    xHttp.send(body);
+      var body = "";
+      params.forEach(function(param, index) {
+        body += param.name + "=" + param.value;
+        if (index != params.length - 1) {
+          body += "&";
+        }
+      });
+      xHttp.send(body);
 
-    return {
-      "then": function(callback) {
-        handleResponse(xHttp, callback);
-      }
+      return {
+        "then": function(callback) {
+          handleResponse(xHttp, callback);
+        }
+      };
     };
   };
 
   return {
     "get": get,
-    "post": post
+    "post": body("post"),
+    "put": body("put")
   };
 };

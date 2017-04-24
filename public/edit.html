@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="scripts/request.js"></script>
+    <script type="text/javascript">
+      window.loadApp = function() {
+        var appId = getQueryParam("id");
+
+        new request("/api/applications/" + appId)
+          .get()
+          .then(function(error, status, responseText) {
+            if (status == 401) {
+              console.log(responseText);
+              window.location = "login.html";
+            } else if (error || status !== 200) {
+              alert(JSON.parse(responseText).errors[0].message);
+            } else {
+              showApp(JSON.parse(responseText).data)
+            }
+          });
+      }
+
+      function getQueryParam(name) {
+        var query = window.location.search;
+        var paramStarts = query.indexOf(name + "=");
+        var paramEnds = query.substring(paramStarts).indexOf("&");
+        if (paramStarts == -1) {
+          return null;
+        } else {
+          if (paramEnds == -1) {
+            return query.substring(paramStarts + name.length + 1);
+          } else {
+            return query.substring(paramStarts + name.length + 1, paramEnds);
+          }
+        }
+      }
+
+      function showApp(app) {
+        var appHtml = "";
+
+        appHtml += "<p>Name: <input id='name' min='4' max='64' required='true' " +
+          "type='text' value='" + app.name + "'/></p>";
+
+        appHtml += "<p>Description: <textarea id='description' min='64' " +
+          "max='1024' rows='3' required='true'/>" + app.description +
+          "</textarea></p>";
+
+          appHtml += "<input onclick='updateApplication()' type='button' value='Update' />";
+
+        appHtml += "<p>Icon: </p><a href='editIcon.html?appId=" + app._id + "'>" +
+          "<img alt='Add' src='/api/applications/" + app._id + "/icon'/></a>";
+
+        appHtml += "<p>Feature graphic: </p><a href='editFeatureGraphic.html?appId=" +
+          app._id + "'><img alt='Add' src='/api/applications/" + app._id +
+          "/featureGraphic'/></a>";
+
+        appHtml += "<p>Screenshots: </p>"
+        if (app.screenshotCount < 8) {
+          appHtml += "<a href='editScreenshot.html?appId=" + app._id +
+            "&screenshotIndex=0&add=true'>Add</a>"
+        }
+        for (var index = 0; index < app.screenshotCount; index++) {
+          appHtml += "<a href='editScreenshot.html?appId=" + app._id +
+            "&screenshotIndex='" + index + "'><img src='/api/applications/" + app._id +
+            "/screenshots/" + index + "'/></a>";
+        }
+
+        document.getElementById("app").innerHTML = appHtml;
+      }
+
+      window.updateApplication = function() {
+        var appId = getQueryParam("id");
+        var sessionId = getCookie("sessionId");
+
+        var name = document.getElementById("name").value;
+        var description = document.getElementById("description").value;
+
+        new request("/api/applications/" + appId).put([{
+          "name": "sessionId",
+          "value": sessionId
+        }, {
+          "name": "name",
+          "value": name
+        }, {
+          "name": "description",
+          "value": description
+        }]).then(function(error, status, responseText) {
+          if (status == 401) {
+            window.location = "login.html";
+          } else if (error || status !== 200) {
+            alert(JSON.parse(responseText).errors[0].message);
+          } else {
+            alert("Your application has been updated");
+          }
+        });
+      }
+
+      function getCookie(name) {
+        var cookieValueStarts = document.cookie.indexOf(name + "=") + name.length + 1;
+        var cookieValueEnds = document.cookie.substring(cookieValueStarts).indexOf(";");
+
+        if (cookieValueStarts > -1) {
+          if (cookieValueEnds > -1) {
+            return document.cookie.substring(cookieValueStarts, cookieValueEnds);
+          } else {
+            return document.cookie.substring(cookieValueStarts);
+          }
+        } else {
+          return null;
+        }
+      }
+    </script>
+    <title>sTORe</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+  </head>
+  <body onload="loadApp()">
+    <noscript>
+      <p>Please enable JavaScript for this page to work correctly.</p>
+    </noscript>
+    <h1 class="margin-top-10px">Edit an application:</h1>
+    <div id="app">
+
+    </div>
+  </body>
+</html>
