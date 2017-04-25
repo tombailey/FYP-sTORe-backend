@@ -42,6 +42,7 @@
           "type='text' value='" + app.name + "'/></p>";
 
         appHtml += "<p>Description: <textarea id='description' min='64' " +
+          "max='1024' rows='3' columns='30' required='true'/>" + app.description +
           "</textarea></p>";
 
           appHtml += "<input onclick='updateApplication()' type='button' value='Update' />";
