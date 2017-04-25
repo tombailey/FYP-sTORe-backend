@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="scripts/request.js"></script>
+    <script type="text/javascript">
+
+      window.loadFeatureGraphic = function() {
+        var appId = getQueryParam("id");
+        document.getElementById("currentFeatureGraphic").src = "/api/applications/" +
+          appId + "/featureGraphic";
+      }
+
+      function getQueryParam(name) {
+        var query = window.location.search;
+        var paramStarts = query.indexOf(name + "=") + name.length + 1;
+        var paramEnds = paramStarts + query.substring(paramStarts).indexOf("&");
+
+        if (paramStarts == -1) {
+          return null;
+        } else {
+          if (paramEnds < paramStarts) {
+            return query.substring(paramStarts);
+          } else {
+            return query.substring(paramStarts, paramEnds);
+          }
+        }
+      }
+
+      window.uploadFeatureGraphic = function() {
+        var appId = getQueryParam("id");
+
+        var sessionId = getCookie("sessionId");
+
+        var featureGraphicFiles = document.getElementById("newFeatureGraphic").files;
+        if (featureGraphicFiles.length != 1) {
+          alert("Please select a single feature graphic");
+        } else if (featureGraphicFiles[0].type != "image/png") {
+          alert("Please select a PNG image");
+        } else {
+          new request("/api/applications/" + appId + "/featureGraphic").put([{
+            "name": "sessionId",
+            "value": sessionId
+          }, {
+            "name": "featureGraphic",
+            "value": featureGraphicFiles[0],
+            "filename": "featureGraphic.png"
+          }], true).then(function(error, status, responseText) {
+            if (status == 401) {
+              window.location = "login.html";
+            } else if (error || status !== 200) {
+              alert(JSON.parse(responseText).errors[0].message);
+            } else {
+              alert("Your application has been updated");
+              window.location = "edit.html?id=" + appId;
+            }
+          });
+        }
+      }
+
+      function getCookie(name) {
+        var cookieValueStarts = document.cookie.indexOf(name + "=") + name.length + 1;
+        var cookieValueEnds = document.cookie.substring(cookieValueStarts).indexOf(";");
+
+        if (cookieValueStarts > -1) {
+          if (cookieValueEnds > -1) {
+            return document.cookie.substring(cookieValueStarts, cookieValueEnds);
+          } else {
+            return document.cookie.substring(cookieValueStarts);
+          }
+        } else {
+          return null;
+        }
+      }
+    </script>
+    <title>sTORe</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+  </head>
+  <body onload="loadFeatureGraphic()">
+    <noscript>
+      <p>Please enable JavaScript for this page to work correctly.</p>
+    </noscript>
+    <h1 class="margin-top-10px">Edit an application's feature graphic:</h1>
+    <div id="content">
+      <p>Current feature graphic: <img id="currentFeatureGraphic" alt="none" width="300px"/></p>
+      <br />
+      <p>New feature graphic: <input id='newFeatureGraphic' type='file'/></p>
+      <input onclick="uploadFeatureGraphic()" type="button" value="Submit" />
+    </div>
+  </body>
+</html>
