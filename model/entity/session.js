@@ -8,7 +8,6 @@ module.exports = (mongoose, uuidV4) => {
       "type": String
     }, "validUntil": {
       "type": Date,
-      "required": true
     }, "developer": {
       "id": {
         "type": mongoose.Schema.Types.ObjectId,
