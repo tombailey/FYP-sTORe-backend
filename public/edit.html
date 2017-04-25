@@ -62,8 +62,8 @@
         }
         for (var index = 0; index < app.screenshotCount; index++) {
           appHtml += "<a href='editScreenshot.html?id=" + app._id +
-            "&screenshotIndex='" + index + "'><img src='/api/applications/" + app._id +
-            "/screenshots/" + index + "'/></a>";
+            "&screenshotIndex=" + index + "'><img src='/api/applications/" + app._id +
+            "/screenshots/" + index + "' width='100px'/></a>";
         }
 
         document.getElementById("app").innerHTML = appHtml;
