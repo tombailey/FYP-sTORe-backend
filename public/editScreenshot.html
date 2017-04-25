@@ -9,7 +9,7 @@
         var index = getQueryParam("screenshotIndex");
 
         var add = getQueryParam("add");
-        if (!add) {
+        if (add != "true") {
           document.getElementById("currentScreenshot").src = "/api/applications/" +
             appId + "/screenshots/" + index;
         }
@@ -87,7 +87,7 @@
     </noscript>
     <h1 class="margin-top-10px">Edit an application's screenshot:</h1>
     <div id="content">
-      <p>Current screenshot: <img id="currentScreenshot" alt="none"/></p>
+      <p>Current screenshot: <img id="currentScreenshot" alt="none" width="300px"/></p>
       <br />
       <p>New screenshot: <input id='newScreenshot' type='file'/></p>
       <input onclick="uploadScreenshot()" type="button" value="Submit" />
