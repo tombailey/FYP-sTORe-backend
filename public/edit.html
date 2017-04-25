@@ -22,15 +22,16 @@
 
       function getQueryParam(name) {
         var query = window.location.search;
-        var paramStarts = query.indexOf(name + "=");
-        var paramEnds = query.substring(paramStarts).indexOf("&");
+        var paramStarts = query.indexOf(name + "=") + name.length + 1;
+        var paramEnds = paramStarts + query.substring(paramStarts).indexOf("&");
+
         if (paramStarts == -1) {
           return null;
         } else {
-          if (paramEnds == -1) {
-            return query.substring(paramStarts + name.length + 1);
+          if (paramEnds < paramStarts) {
+            return query.substring(paramStarts);
           } else {
-            return query.substring(paramStarts + name.length + 1, paramEnds);
+            return query.substring(paramStarts, paramEnds);
           }
         }
       }
