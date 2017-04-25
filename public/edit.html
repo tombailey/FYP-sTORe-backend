@@ -58,7 +58,7 @@
         appHtml += "<p>Screenshots: </p>"
         if (app.screenshotCount < 8) {
           appHtml += "<a href='editScreenshot.html?id=" + app._id +
-            "&screenshotIndex=0&add=true'>Add</a>"
+            "&screenshotIndex=0&add=true'>Add</a><br /><br />"
         }
         for (var index = 0; index < app.screenshotCount; index++) {
           appHtml += "<a href='editScreenshot.html?id=" + app._id +
