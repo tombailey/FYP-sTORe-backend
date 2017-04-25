@@ -47,20 +47,20 @@
 
           appHtml += "<input onclick='updateApplication()' type='button' value='Update' />";
 
-        appHtml += "<p>Icon: </p><a href='editIcon.html?appId=" + app._id + "'>" +
+        appHtml += "<p>Icon: </p><a href='editIcon.html?id=" + app._id + "'>" +
           "<img alt='Add' src='/api/applications/" + app._id + "/icon'/></a>";
 
-        appHtml += "<p>Feature graphic: </p><a href='editFeatureGraphic.html?appId=" +
+        appHtml += "<p>Feature graphic: </p><a href='editFeatureGraphic.html?id=" +
           app._id + "'><img alt='Add' src='/api/applications/" + app._id +
           "/featureGraphic'/></a>";
 
         appHtml += "<p>Screenshots: </p>"
         if (app.screenshotCount < 8) {
-          appHtml += "<a href='editScreenshot.html?appId=" + app._id +
+          appHtml += "<a href='editScreenshot.html?id=" + app._id +
             "&screenshotIndex=0&add=true'>Add</a>"
         }
         for (var index = 0; index < app.screenshotCount; index++) {
-          appHtml += "<a href='editScreenshot.html?appId=" + app._id +
+          appHtml += "<a href='editScreenshot.html?id=" + app._id +
             "&screenshotIndex='" + index + "'><img src='/api/applications/" + app._id +
             "/screenshots/" + index + "'/></a>";
         }
