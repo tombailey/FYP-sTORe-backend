@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="scripts/request.js"></script>
+    <script type="text/javascript">
+
+      window.loadScreenshot = function() {
+        var appId = getQueryParam("id");
+        var index = getQueryParam("screenshotIndex");
+
+        var add = getQueryParam("add");
+        if (!add) {
+          document.getElementById("currentScreenshot").src = "/api/applications/" +
+            appId + "/screenshots/" + index;
+        }
+      }
+
+      function getQueryParam(name) {
+        var query = window.location.search;
+        var paramStarts = query.indexOf(name + "=") + name.length + 1;
+        var paramEnds = paramStarts + query.substring(paramStarts).indexOf("&");
+
+        if (paramStarts == -1) {
+          return null;
+        } else {
+          if (paramEnds < paramStarts) {
+            return query.substring(paramStarts);
+          } else {
+            return query.substring(paramStarts, paramEnds);
+          }
+        }
+      }
+
+      window.uploadScreenshot = function() {
+        var appId = getQueryParam("id");
+        var index = getQueryParam("screenshotIndex");
+
+        var sessionId = getCookie("sessionId");
+
+        var screenshotFiles = document.getElementById("newScreenshot").files;
+        if (screenshotFiles.length != 1) {
+          alert("Please select a single screenshot");
+        } else if (screenshotFiles[0].type != "image/png") {
+          alert("Please select a PNG image");
+        } else {
+          new request("/api/applications/" + appId + "/screenshots/" + index).put([{
+            "name": "sessionId",
+            "value": sessionId
+          }, {
+            "name": "screenshot",
+            "value": screenshotFiles[0],
+            "filename": "screenshot.png"
+          }], true).then(function(error, status, responseText) {
+            if (status == 401) {
+              window.location = "login.html";
+            } else if (error || status !== 200) {
+              alert(JSON.parse(responseText).errors[0].message);
+            } else {
+              alert("Your application has been updated");
+              window.location = "edit.html?id=" + appId;
+            }
+          });
+        }
+      }
+
+      function getCookie(name) {
+        var cookieValueStarts = document.cookie.indexOf(name + "=") + name.length + 1;
+        var cookieValueEnds = document.cookie.substring(cookieValueStarts).indexOf(";");
+
+        if (cookieValueStarts > -1) {
+          if (cookieValueEnds > -1) {
+            return document.cookie.substring(cookieValueStarts, cookieValueEnds);
+          } else {
+            return document.cookie.substring(cookieValueStarts);
+          }
+        } else {
+          return null;
+        }
+      }
+    </script>
+    <title>sTORe</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+  </head>
+  <body onload="loadScreenshot()">
+    <noscript>
+      <p>Please enable JavaScript for this page to work correctly.</p>
+    </noscript>
+    <h1 class="margin-top-10px">Edit an application's screenshot:</h1>
+    <div id="content">
+      <p>Current screenshot: <img id="currentScreenshot" alt="none"/></p>
+      <br />
+      <p>New screenshot: <input id='newScreenshot' type='file'/></p>
+      <input onclick="uploadScreenshot()" type="button" value="Submit" />
+    </div>
+  </body>
+</html>
