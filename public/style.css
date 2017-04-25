@@ -17,6 +17,10 @@ h1 {
   margin-top: 10px;
 }
 
+.margin-left-10px {
+  margin-left: 10px;
+}
+
 .float-right {
   float: right;
 }

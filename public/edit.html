@@ -58,11 +58,12 @@
         appHtml += "<p>Screenshots: </p>"
         if (app.screenshotCount < 8) {
           appHtml += "<a href='editScreenshot.html?id=" + app._id +
-            "&screenshotIndex=0&add=true'>Add</a><br /><br />"
+            "&screenshotIndex=" + app.screenshotCount + "&add=true'>Add</a>" +
+            "<br /><br />";
         }
         for (var index = 0; index < app.screenshotCount; index++) {
           appHtml += "<a href='editScreenshot.html?id=" + app._id +
-            "&screenshotIndex=" + index + "'><img src='/api/applications/" + app._id +
+            "&screenshotIndex=" + index + "'><img class='margin-left-10px' src='/api/applications/" + app._id +
             "/screenshots/" + index + "' width='100px'/></a>";
         }
 
