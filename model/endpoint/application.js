@@ -67,7 +67,7 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
 
   const searchByDeveloper = (req, res, developerId, page) => {
     applicationService.getApplicationsByDeveloperId(developerId).then((applications) => {
-      success.ok(res, applications, cache.private().hours(1));
+      success.ok(res, applications);
     }).catch((err) => {
       console.error(err);
       error.internalServerError(res, "database issue");
