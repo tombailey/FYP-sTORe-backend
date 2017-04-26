@@ -23,7 +23,7 @@
       function getQueryParam(name) {
         var query = window.location.search;
         var paramStarts = query.indexOf(name + "=") > 0 ?
-          (query.indexOf(name + "=") + name.length + 1) : 0;
+          (query.indexOf(name + "=") + name.length + 1) : -1;
         var paramEnds = paramStarts + query.substring(paramStarts).indexOf("&");
 
         if (paramStarts == -1) {
