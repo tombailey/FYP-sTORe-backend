@@ -46,7 +46,17 @@
           "max='1024' rows='3' columns='30' required='true'/>" + app.description +
           "</textarea></p>";
 
-          appHtml += "<input onclick='updateApplication()' type='button' value='Update' />";
+        appHtml += "<input onclick='updateApplication()' type='button' value='Update' />";
+
+        if (app.currentVersion === undefined) {
+          appHtml += "<p>Current version number: None</p><a href='addVersion.html?id=" +
+            app._id + "'>Add</a>";
+        } else {
+          appHtml += "<p>Current version number: " + app.currentVersion.number +
+            "</p><a href='addVersion.html?id=" +
+            app._id + "&currentVersionNumber=" + app.currentVersion.number +
+            "'>Add</a>";
+        }
 
         appHtml += "<p>Icon: </p><a href='editIcon.html?id=" + app._id + "'>" +
           "<img alt='Add' src='/api/applications/" + app._id + "/icon'/></a>";
