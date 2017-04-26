@@ -219,7 +219,6 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
           cacheHeaderOverriddenRequest.overrideRequest(application.iconLink,
             cache.private().days(1), req, res);
         }
-      applicationService.incrementDownloadCount(appId);
     }).catch((err) => {
       console.error(err);
       error.internalServerError(res, "database issue");
@@ -300,7 +299,6 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
           cacheHeaderOverriddenRequest.overrideRequest(
             application.featureGraphicLink, cache.private().days(1), req, res);
         }
-      applicationService.incrementDownloadCount(appId);
     }).catch((err) => {
       console.error(err);
       error.internalServerError(res, "database issue");
@@ -341,7 +339,6 @@ module.exports = (app, upload, mongoose, entities, storageBucket) => {
           cacheHeaderOverriddenRequest.overrideRequest(
             screenshotLinks[screenshotNumber], cache.private().days(1), req, res);
         }
-        applicationService.incrementDownloadCount(appId);
       }
     }).catch((err) => {
       console.error(err);
