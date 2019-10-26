@@ -12,7 +12,7 @@
     "bcrypt": "^1.0.2",
     "express": "^4.14.0",
     "http-status": "^0.2.3",
-    "mongoose": "^4.7.6",
+    "mongoose": "^5.7.7",
     "sinon-express-mock": "^1.2.4"
   },
   "engines": {
